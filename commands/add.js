@@ -64,8 +64,8 @@ module.exports = {
             // get the last argument of the command. Should be clip
             const last = args.pop();
             // Verify that clip is valid link and from Aaerios's twitch
-            if (last.includes('www.twitch.tv/siraaerios/clip/') && 
-                (last.startsWith('https') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
+            if (last.includes('twitch.tv') && last.includes('clip') && 
+                (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
                 // placeholder for google addition api
                 message.channel.send('Attempting to add clip to database...');
                 // Launch Async function 

@@ -30,7 +30,7 @@ client.once('ready', () => {
 
 // trigger for bat seeing basic commands
 client.on('message', message => {
-    if(!message.content.startsWith(prefix) || message.author.bot) return;
+    if(!message.content.startsWith(prefix.toLowerCase()) || message.author.bot) return;
     // Split command from args
     var args = message.content.slice(prefix.length);
     const command = args.split(/ +/).shift().toLowerCase();
@@ -52,7 +52,9 @@ client.on('message', message => {
         client.commands.get('mustard').execute(message, args);
     } else if (command == 'tarkov') {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/AuspiciousCuriousTitanCopyThis?filter=clips&range=all&sort=time');
-    } 
+    } else if (command == 'milk') {
+        message.channel.send('https://www.twitch.tv/siraaerios/clip/PhilanthropicJoyousFriseeRitzMitz?filter=clips&range=all&sort=time');
+    }
     // Library Commands
     else if (command == 'songs') {
         message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');

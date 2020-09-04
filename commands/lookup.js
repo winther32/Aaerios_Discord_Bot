@@ -45,8 +45,8 @@ module.exports = {
     execute(message, args) {
         var link = args[0]; // Get full link from args
         // Verfiy link
-        if (link.includes('www.twitch.tv/siraaerios/clip/') && 
-            (link.startsWith('https') || link.startsWith('www.') || link.startsWith('twitch.tv'))) {
+        if (last.includes('twitch.tv') && last.includes('clip') && 
+            (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
             // placeholder for google addition api
             message.channel.send('Looking up clip in database...');
             // Launch function to lookup

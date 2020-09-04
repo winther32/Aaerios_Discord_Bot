@@ -73,7 +73,7 @@ module.exports = {
             // get the last argument of the command. Should be clip link
             const last = args.pop();
             // Verify link
-            if (last.includes('twitch.tv/siraaerios/clip/') && 
+            if (last.includes('twitch.tv') && last.includes('clip') && 
                 (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
                 // launch async func
                 (async() => {
