@@ -1,2 +1,2 @@
-# Aaerios_Discord_Bot
-Discord bot to manage twitch clips for SirAaerios.
+# Aaerios Discord Bot
+Discord bot to manage twitch clips for SirAaerios. **CANNOT GO PUBLIC! CONTAINS PRIVATE KEYS**
