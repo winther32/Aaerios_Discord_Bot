@@ -58,7 +58,7 @@ client.on('message', message => {
     // Library Commands
     else if (command == 'songs') {
         message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
-    } else if (command == 'library') {
+    } else if (command == 'library' || command == 'lib') {
         message.channel.send('https://docs.google.com/spreadsheets/d/13NWMHvTFKaaeKlu2u7HOkPT84PT-5ARKpsnHAihU26E/edit?usp=sharing');
     } else if (command == 'add') {
         client.commands.get('add').execute(message, args, sender.username);

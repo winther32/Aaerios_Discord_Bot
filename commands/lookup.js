@@ -43,10 +43,15 @@ module.exports = {
     name: 'lookup',
     description: 'looks up clip in sheet',
     execute(message, args) {
+        // Verify got args
+        if (args.length < 1) {
+            message.channel.send('Invalid format\n**Usage:** !lookup <link>');
+            return;
+        }
         var link = args[0]; // Get full link from args
         // Verfiy link
-        if (last.includes('twitch.tv') && last.includes('clip') && 
-            (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
+        if (link.includes('twitch.tv') && link.includes('clip') && 
+            (link.startsWith('https://') || link.startsWith('www.') || last.startsWith('twitch.tv'))) {
             // placeholder for google addition api
             message.channel.send('Looking up clip in database...');
             // Launch function to lookup

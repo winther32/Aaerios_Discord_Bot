@@ -8,7 +8,7 @@ module.exports = {
     execute(message, args) {
         message.channel.send("**Clippy Boi Command List!**\n\n" + 
                             "**Clips:\n**" + 
-                            "mustard, tarkov\n" + 
+                            "mustard, tarkov, milk\n" + 
                             "**Library:**\n" + 
                             "library, songs, overwrite, add, lookup\n" + 
                             "**Questions:**\n" +
