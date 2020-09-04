@@ -6,7 +6,7 @@ module.exports = {
     name: 'help',
     description: 'info on available commands',
     execute(message, args) {
-        message.channel.send("**Clippy Boi Command List!**\n\n" + 
+        message.channel.send("**Clippy Bot Command List!**\n\n" + 
                             "**Clips:\n**" + 
                             "mustard, tarkov, milk\n" + 
                             "**Library:**\n" + 
