@@ -12,7 +12,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 // Prefix for the bot command to be triggered
-const prefix = '!';
+const prefix = '$';
 const fs = require('fs');
 client.commands = new Discord.Collection();
 
