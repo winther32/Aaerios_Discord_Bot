@@ -46,6 +46,8 @@ client.on('message', message => {
     // Help command
     else if (command == 'help' || command == 'commands') {
         client.commands.get('help').execute(message, args);
+    } else if (command == 'intro') {
+        client.commands.get('intro').execute(message);
     }
     // Hardcode Clip commands
     else if (command == 'mustard'){

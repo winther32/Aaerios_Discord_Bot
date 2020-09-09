@@ -80,10 +80,10 @@ module.exports = {
                     await overwrite(message, args, username, last);
                 })();
             } else {
-                message.channel.send('Invalid format\n**Usage:** !overwrite <comma seperated keywords>**,** <link>');
+                message.channel.send('Invalid format\n**Usage:** !overwrite <comma seperated keywords/phrases>**,** <link>');
             }
         } else {
-            message.channel.send('Invalid format\n**Usage:** !overwrite <comma seperated keywords>**,** <link>');
+            message.channel.send('Invalid format\n**Usage:** !overwrite <comma seperated keywords/phrases>**,** <link>');
         }
     }
 }

@@ -73,10 +73,12 @@ module.exports = {
                     await start(message, args, username, last);
                 })();
             } else {
-                message.channel.send('Invalid format\n**Usage:** !add <comma seperated keywords>**,** <link>');
+                message.channel.send('Invalid format\n**Usage:** !add <comma seperated keywords/phrases>**,** <link>' +
+                                    "**Example:** !add we are tarkov, escape from tarkov, song, www.twitchClip.com");
             }
         } else {
-            message.channel.send('Invalid format\n**Usage:** !add <comma seperated keywords>**,** <link>');
+            message.channel.send('Invalid format\n**Usage:** !add <comma seperated keywords/phrases>**,** <link>' +
+                                "**Example:** !add we are tarkov, escape from tarkov, song, www.twitchClip.com");
         }
     }
 }
