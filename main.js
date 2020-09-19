@@ -25,7 +25,7 @@ for (const file of commandFiles) {
 
 // Log that the Bot is online
 client.once('ready', () => {
-    console.log('Music Boi is online!')
+    console.log('Clippy Bot is online!')
 });
 
 // trigger for bat seeing basic commands
@@ -56,6 +56,8 @@ client.on('message', message => {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/AuspiciousCuriousTitanCopyThis?filter=clips&range=all&sort=time');
     } else if (command == 'milk') {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/PhilanthropicJoyousFriseeRitzMitz?filter=clips&range=all&sort=time');
+    } else if (command == 'angry') {
+        message.channel.send('Aaerios ANGRY!', {files: ["./images/Aaerios_Angry.png"]});
     }
     // Library Commands
     else if (command == 'songs') {
