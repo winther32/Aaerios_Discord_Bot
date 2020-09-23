@@ -45,7 +45,7 @@ module.exports = {
     execute(message, args) {
         // Verify got args
         if (args.length < 1) {
-            message.channel.send('Invalid format\n**Usage:** !lookup <link>');
+            message.channel.send('Invalid format\n**Usage:** $lookup <link>');
             return;
         }
         var link = args[0]; // Get full link from args
@@ -59,7 +59,7 @@ module.exports = {
                 await lookup(message, link);
             })();   
         } else {
-            message.channel.send('Invalid format\n**Usage:** !lookup <link>');
+            message.channel.send('Invalid format\n**Usage:** $lookup <link>');
         }
     }
 }
