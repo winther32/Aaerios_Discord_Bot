@@ -8,7 +8,9 @@ module.exports = {
     execute(message, args) {
         message.channel.send("**Clippy Bot Command List!**\n\n" + 
                             "**Clips:\n**" + 
-                            "mustard, tarkov, milk, angry\n" + 
+                            "mustard, tarkov, milk\n" + 
+                            "**Images:\n**" +
+                            "angry\n" +
                             "**Library:**\n" + 
                             "library, songs, overwrite, add, lookup\n" + 
                             "**Questions:**\n" +
