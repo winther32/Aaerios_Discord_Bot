@@ -65,7 +65,9 @@ client.on('message', message => {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/AuspiciousCuriousTitanCopyThis?filter=clips&range=all&sort=time');
     } else if (command == 'milk') {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/PhilanthropicJoyousFriseeRitzMitz?filter=clips&range=all&sort=time');
-    } 
+    } else if (command == 'salsa') {
+        message.channel.send("https://www.twitch.tv/siraaerios/clip/GrotesqueHorribleDogPupper?filter=clips&range=all&sort=time");
+    }
     
     // Image commands
     else if (command == 'angry') {
