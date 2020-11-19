@@ -10,7 +10,7 @@ module.exports = {
                             "**Clips:**\n" + 
                             "`mustard, tarkov, milk`\n" + 
                             "**Images:**\n" +
-                            "`angry, swol/unit`\n" +
+                            "`angry, swol/unit, devil`\n" +
                             "**Library:**\n" + 
                             "`library, songs, overwrite, add, lookup`\n" + 
                             "**Questions:**\n" +

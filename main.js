@@ -72,6 +72,8 @@ client.on('message', message => {
         message.channel.send('Aaerios ANGRY!', {files: ["./images/Aaerios_Angry.png"]});
     } else if (command == 'swol' || command == 'unit') {
         message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["./images/swol_aaerios.jpg"]});
+    } else if (command == 'devil') {
+        message.channel.send({files: ["./images/devil_aaerios.png"]});
     }
     
     // Library Commands
