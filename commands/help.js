@@ -7,13 +7,13 @@ module.exports = {
     description: 'info on available commands',
     execute(message, args) {
         message.channel.send("**Clippy Bot Command List!**\n\n" + 
-                            "**Clips:\n**" + 
-                            "mustard, tarkov, milk\n" + 
-                            "**Images:\n**" +
-                            "angry\n" +
+                            "**Clips:**\n" + 
+                            "`mustard, tarkov, milk`\n" + 
+                            "**Images:**\n" +
+                            "`angry, swol/unit`\n" +
                             "**Library:**\n" + 
-                            "library, songs, overwrite, add, lookup\n" + 
+                            "`library, songs, overwrite, add, lookup`\n" + 
                             "**Questions:**\n" +
-                            "DM Winther32");
+                            "`DM Winther32`");
     }
 }

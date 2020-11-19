@@ -13,6 +13,7 @@ const client = new Discord.Client();
 
 // Prefix for the bot command to be triggered
 const prefix = '$';
+const prefix1 = 'c!';
 const fs = require('fs');
 client.commands = new Discord.Collection();
 
@@ -28,11 +29,19 @@ client.once('ready', () => {
     console.log('Clippy Bot is online!')
 });
 
-// trigger for bat seeing basic commands
+// trigger for bot seeing basic commands
 client.on('message', message => {
-    if(!message.content.startsWith(prefix.toLowerCase()) || message.author.bot) return;
+    if((!message.content.toLowerCase().startsWith(prefix) && !message.content.toLowerCase().startsWith(prefix1)) || message.author.bot) return;
+    
+    // remove prefix
+    var args; 
+    if (message.content.toLowerCase().startsWith(prefix)) {
+        args = message.content.slice(prefix.length);
+    } else {
+        args = message.content.slice(prefix1.length);
+    }
+    
     // Split command from args
-    var args = message.content.slice(prefix.length);
     const command = args.split(/ +/).shift().toLowerCase();
     args = args.slice(command.length+1).split(', ');
     var sender = message.author; // User who send the command
@@ -56,9 +65,15 @@ client.on('message', message => {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/AuspiciousCuriousTitanCopyThis?filter=clips&range=all&sort=time');
     } else if (command == 'milk') {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/PhilanthropicJoyousFriseeRitzMitz?filter=clips&range=all&sort=time');
-    } else if (command == 'angry') {
+    } 
+    
+    // Image commands
+    else if (command == 'angry') {
         message.channel.send('Aaerios ANGRY!', {files: ["./images/Aaerios_Angry.png"]});
+    } else if (command == 'swol' || command == 'unit') {
+        message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["./images/swol_aaerios.jpg"]});
     }
+    
     // Library Commands
     else if (command == 'songs') {
         message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
