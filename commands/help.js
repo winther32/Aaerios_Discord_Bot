@@ -35,7 +35,7 @@ module.exports = {
                     {name: 'Adding A Clip:', value: "`To add a clip simply use the $add command followed by comma seperated keywords and the link to the clip!`"},
                     {name: "Overwriting A Clip:", value: "`If you believe that the keywords paired with a certain clip are wrong or you want to add new keywords you can use the $overwrite command followed by the replacement keywords and the corresponding clip link.`"},
                     {name: "The Lookup Command:", value: "`This command searches the database. If you use $lookup followed by a link, Clippy Bot will find the keywords associated with that link. If you use $lookup followed by keywords Clippy Bot will find all the clips with those keywords.`"},
-                    {name: "The Songs Command:", value: "`Our Lord Aaerios has blessed us many a time with his beautiful songs. These have been saved all in one place for your enjoyment at the link provided.`"}
+                    {name: "The Songs Command:", value: "`Our Lord Aaerios has blessed us many a time with his beautiful songs. These have been saved all in one place for your enjoyment at the link provided by $songs.`"}
                 )
                 .setFooter("If you still have questions feel free to DM Winther");
 
