@@ -73,7 +73,7 @@ module.exports = {
     description: 'looks up clip in sheet',
     execute(message, args) {
         // Verify got args
-        if (args.length < 1) {
+        if (args[0] == '') {
             message.channel.send('Invalid format\n**Usage:** $lookup <link> **OR** $lookup <comma seperated keywords>');
             return;
         }

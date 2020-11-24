@@ -60,7 +60,7 @@ module.exports = {
     description: 'adds clips to spreadsheet',
     execute(message, args, username) {
         // Ensure getting something to sort by and a link
-        if (args.length >= 1) {
+        if (args[0] != '') {
             // get the last argument of the command. Should be clip
             const last = args.pop();
             // Verify that clip is valid link and from Aaerios's twitch

@@ -8,6 +8,7 @@
 
 
 // Init discord sdk
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
@@ -43,8 +44,14 @@ client.on('message', message => {
     
     // Split command from args
     const command = args.split(/ +/).shift().toLowerCase();
-    args = args.slice(command.length+1).split(', ');
+    // Create args array
+    args = args.slice(command.length+1).split(',');
+    // Trim all the args to clean up
+    for (var i = 0; i < args.length; i++) {
+        args[i] = args[i].trim();
+    }
     var sender = message.author; // User who send the command
+    console.log(sender.username + " " + command + ": " + args);
 
     // Debug and basic test commands
     if (command == 'ping') {

@@ -69,7 +69,7 @@ module.exports = {
     description: 'overwrite keywords for given clip',
     execute(message, args, username) {
          // Ensure getting new keywords and a link
-         if (args.length >= 1) {
+         if (args[0] != '') {
             // get the last argument of the command. Should be clip link
             const last = args.pop();
             // Verify link
