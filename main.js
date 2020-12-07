@@ -51,7 +51,8 @@ client.on('message', message => {
         args[i] = args[i].trim();
     }
     var sender = message.author; // User who send the command
-    console.log(sender.username + " " + command + ": " + args);
+    // Log parsed call info
+    console.log("Sender:" + sender.username + ", Command: " + command + ", Args: " + args);
 
     // Debug and basic test commands
     if (command == 'ping') {
@@ -78,11 +79,11 @@ client.on('message', message => {
     
     // Image commands
     else if (command == 'angry') {
-        message.channel.send('Aaerios ANGRY!', {files: ["./images/Aaerios_Angry.png"]});
+        message.channel.send('Aaerios ANGRY!', {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785628010665345044/Aaerios_Angry.png"]});
     } else if (command == 'unit') {
-        message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["./images/swol_aaerios.jpg"]});
+        message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627801332088852/swol_aaerios.jpg"]});
     } else if (command == 'devil') {
-        message.channel.send({files: ["./images/devil_aaerios.png"]});
+        message.channel.send({files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627918972878868/devil_aaerios.png"]});
     }
     
     // Library Commands

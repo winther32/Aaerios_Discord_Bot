@@ -21,8 +21,9 @@ module.exports = {
                 {name: 'Images:', value: "`angry`, `unit`, `devil`"},
                 {name: 'Library:', value: "`library`, `songs`, `overwrite`, `add`, `lookup`"},
             )
-            .setFooter("For command recommnedations and Q's DM Winther");
+            .setFooter("For command recommendations and Q's DM Winther");
         
+        // Clip Library Help embed
         const libEmbed = new Discord.MessageEmbed()
                 .setColor('187bcd')
                 .setTitle("Using The Clippy Bot Clip Library")
