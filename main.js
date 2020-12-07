@@ -52,7 +52,7 @@ client.on('message', message => {
     }
     var sender = message.author; // User who send the command
     // Log parsed call info
-    console.log("Sender:" + sender.username + ", Command: " + command + ", Args: " + args);
+    console.log("Sender:" + sender.username + ", Command:" + command + ", Args:" + args);
 
     // Debug and basic test commands
     if (command == 'ping') {
