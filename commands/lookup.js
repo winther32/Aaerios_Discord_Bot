@@ -42,6 +42,7 @@ async function lookup(message, link) {
 }
 
 // Function to lookup and return a list of clips with given keywords
+// This is a super basic search algorithm. O(n*m) n=rows in database, m=args given
 async function find(message, args) {
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
@@ -49,22 +50,35 @@ async function find(message, args) {
     // Get the sheet in spreadsheet
     const sheet = await doc.sheetsByIndex[0];
 
-    // For loop to check for dupicate links
     var rows = await sheet.getRows();
-    var results = "";
-    // Linear loop to find match if exists
+    var results = [];
+    var numberOfResults = 0;
+    // Linear loop to find match if exists up to 5 matches returned
     for (var i = 0; i < rows.length; i++) {
+        // Try to match args to keyworkds in row.
         for (var j = 0; j < args.length; j++) {
+            // Add link to result array if a keyword matches
             if (rows[i].Keywords.includes(args[j])) {
-                results = results + rows[i].Clip + "\n";
+                results.push(rows[i].Clip);
+                numberOfResults++;
                 break;
             }
         }
     }
-    if (results == "") {
+
+    // Return the results of search
+    if (results.length == 0) {
         message.channel.send("No clips found with the keyword(s): " + args);
+    } else if (numberOfResults > 5) {
+        message.channel.send(numberOfResults + " clips matched your search. Here are the first 5:\n")
+        for (var i=0; i<5; i++){
+            message.channel.send(results[i]);
+        }
+        message.channel.send("For the rest of the matching clips try narrowing your search or use `$library` and search the full library.")
     } else {
-        message.channel.send(results);
+        for (var i=0; i<results.length; i++){
+            message.channel.send(results[i]);
+        }
     }
 }
 
@@ -77,6 +91,12 @@ module.exports = {
             message.channel.send('Invalid format\n**Usage:** $lookup <link> **OR** $lookup <comma seperated keywords>');
             return;
         }
+        // Limiting large amounts of keywords in search.
+        if (args.length > 5) {
+            message.channel.send("Please limit your searches to 5 keywords at most");
+            return;
+        }
+
         var link = args[0]; // Get full link from args
         // Verfiy link
         if (link.includes('twitch.tv') && link.includes('clip') && 
