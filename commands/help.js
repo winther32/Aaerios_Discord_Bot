@@ -36,7 +36,7 @@ module.exports = {
                     {name: "Finding A Clip With GoogleSheets:", value: "`To find your favorite clip first you have to open the GoogleSheet where everything \
                         is saved. You can get the link with the $library command. Next use the ctrl+F function to search for the keyword you are looking for.`"},
                     {name: "Finding A Clip With The Lookup Command:", value: "`You can also find a clip with the $lookup command followed by comma seperated \
-                        keywords. Clippy Bot will then list all the clip links that have the given keyword(s). Discord will also show previews for the first 5 links listed.`"},
+                        keywords. Clippy Bot will then list all the first 5 clip links that have the given keyword(s). Discord will also show previews for the first 5 links listed.`"},
                     {name: 'Adding A Clip:', value: "`To add a clip simply use the $add command followed by comma seperated keywords and the link to the clip!`"},
                     {name: "Overwriting A Clip:", value: "`If you believe that the keywords paired with a certain clip are wrong or you want to add new keywords \
                         you can use the $overwrite command followed by the replacement keywords and the corresponding clip link.`"},
