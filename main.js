@@ -68,13 +68,15 @@ client.on('message', message => {
     }
     // Hardcode Clip commands
     else if (command == 'mustard'){
-        client.commands.get('mustard').execute(message, args);
+        message.channel.send('https://www.twitch.tv/siraaerios/clip/BumblingLachrymoseFloofM4xHeh?filter=clips&range=all&sort=time');
     } else if (command == 'tarkov') {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/AuspiciousCuriousTitanCopyThis?filter=clips&range=all&sort=time');
     } else if (command == 'milk') {
         message.channel.send('https://www.twitch.tv/siraaerios/clip/PhilanthropicJoyousFriseeRitzMitz?filter=clips&range=all&sort=time');
     } else if (command == 'salsa') {
         message.channel.send("https://www.twitch.tv/siraaerios/clip/GrotesqueHorribleDogPupper?filter=clips&range=all&sort=time");
+    } else if (command == 'yogurt') {
+        message.channel.send("https://clips.twitch.tv/PrettyArtisticTapirPeoplesChamp");
     }
     
     // Image commands
@@ -101,4 +103,5 @@ client.on('message', message => {
 
 });
 
-client.login('NzUwMjE0NTUxNDU0MDg5MjM3.X03Rvw.-xeUprxzZWF4EgD-RITp7oxrmVw')
+const access = require("./secrets/discordToken");
+client.login(access.token)

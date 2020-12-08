@@ -2,19 +2,26 @@
  * This function produces a formatted display of all commands that this bot uses.
 */
 
+const { DiscordAPIError, Channel } = require("discord.js");
+const Discord = require('discord.js');
+const Colors = require('../colors');
+
 module.exports = {
     name: 'intro',
     description: 'introduction speech',
     execute(message) {
-        message.channel.send("**Hello I'm Clippy Bot!**\n" + 
-                           "My purpose is to help you create a community managed twitch clip library on Google Sheets.\n\n" +
-                           "**What can I do?**\n" +
-                           "I can add clips to a sheet, overwrite the keywords, and get the keywords for a given link.\n" + 
-                           "**What can't I do?**\n" +
-                           "I can't search the library! You're gonna have to use **ctrl + f** in spreadsheet for that (for now).\n" +
-                           "I can't delete clips from the sheet. You're gonna have to ask Winter32 to do that.\n\n" +
-                           "**Some tips for creating a great library:**\n" +
-                           "Make sure to use unique keywords. I would suggest a title/description, the game, and a category descriptor such as song, funny, fail, etc.\n" +
-                           "All of these keywords are how you will find the clips later so try to make them useful!");
+        // Create the intro embed
+        const introEmbed = new Discord.MessageEmbed()
+            .setColor(Colors.blue)
+            .setTitle("Hello I'm Clippy Bot!")
+            .setDescription("My purpose is to help you create a community managed twitch clip library on Google Sheets. To learn more use `$help` and `$help library`.")
+            .addFields( 
+                {name: "What can I do?",  value: "I can add clips to a sheet, overwrite the keywords, and look up clips in the library."},
+                {name: "What can't I do?", value: "I can't delete clips from the sheet. You're gonna have to ask Winter32 to do that."},
+                {name: "Some tips for creating a great library:", value: "Make sure to use unique keywords. Try to use keywords or short " +
+                    "phrases that define what happens in the clip. All of these keywords are how you will find the clips later so try to make them useful!"},
+            )
+            .setFooter("Created by Winther");
+        message.channel.send(introEmbed);
     }
 }

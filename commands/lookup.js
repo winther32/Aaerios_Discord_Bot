@@ -7,7 +7,7 @@
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-var creds = require('./client_secret.json');
+var creds = require('../secrets//client_secret.json');
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 const doc = new GoogleSpreadsheet('13NWMHvTFKaaeKlu2u7HOkPT84PT-5ARKpsnHAihU26E');
 
@@ -42,7 +42,8 @@ async function lookup(message, link) {
 }
 
 // Function to lookup and return a list of clips with given keywords
-// This is a super basic search algorithm. O(n*m) n=rows in database, m=args given
+// This is a basic search algorithm. O(N*M) N=rows in database, M=args given
+// Realistically, in practice expect to get much closer to O(N) time.
 async function find(message, args) {
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
@@ -55,13 +56,19 @@ async function find(message, args) {
     var numberOfResults = 0;
     // Linear loop to find match if exists up to 5 matches returned
     for (var i = 0; i < rows.length; i++) {
-        // Try to match args to keyworkds in row.
-        for (var j = 0; j < args.length; j++) {
-            // Add link to result array if a keyword matches
-            if (rows[i].Keywords.includes(args[j])) {
+        // If the first keyword matches, verify rest of keywords before adding
+        if (rows[i].Keywords.includes(args[0])) {
+            var matches = 1; // Count keyword matches, already matched 1
+            // Verify rest user keywords are present in clip keywords. Won't enter loop if only 1 user keyword
+            for (matches; matches<args.length; matches++) {
+                if (!rows[i].Keywords.includes(args[matches])) {
+                    break;
+                }
+            }
+            // If all user keywords present, add clip to result and count it.
+            if (matches == args.length) {
                 results.push(rows[i].Clip);
                 numberOfResults++;
-                break;
             }
         }
     }
