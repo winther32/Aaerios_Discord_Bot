@@ -21,7 +21,7 @@ const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-// Google Sheet info for SirAaerios clip library
+// Google Sheet info for clip library
 const sheet = require('./secrets/sheetID');
 
 // Prefix for the bot command to be triggered

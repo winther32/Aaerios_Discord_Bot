@@ -8,8 +8,8 @@
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-var creds = require('../secrets/client_secret.json');
-var sheet = require('../secrets/sheetID');
+var creds = require('../secrets/client_secret.json'); // Sheet manager creds
+var sheet = require('../secrets/sheetID'); // Lib sheet ID
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 const doc = new GoogleSpreadsheet(sheet.ID);
 
