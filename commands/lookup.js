@@ -16,8 +16,9 @@
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 var creds = require('../secrets//client_secret.json');
+var sheet = require('../secrets/sheetID');
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
-const doc = new GoogleSpreadsheet('13NWMHvTFKaaeKlu2u7HOkPT84PT-5ARKpsnHAihU26E');
+const doc = new GoogleSpreadsheet(sheet.ID);
 
 // Function to access sheet via google api
 async function lookup(message, link) {

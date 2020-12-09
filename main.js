@@ -1,8 +1,16 @@
 /*
- * This is a Discord Bot built specifically for SirAaerios's server "The Realm"
+ * Clippy Bot Discord Bot
+ *
+ * This is a Discord Bot built specifically for SirAaerios's server "The Realm"!
+ * 
+ * If you wish to adapt this bot to manage another clip library, you will need to create a new bot
+ * on Discord and create your own Google service account to manage the google sheet. 
  *
  * This bot helps to build and manage a community driven library of twitch clips via Google Sheets.
- * It also has some fun commands for the community to use.
+ * A link to SirSserios's library is below:
+ * @see https://docs.google.com/spreadsheets/d/13NWMHvTFKaaeKlu2u7HOkPT84PT-5ARKpsnHAihU26E/edit?usp=sharing
+ * 
+ * This bot also has fun commands specifically tailored to the SirAaerios Discord server.
  * 
  * Built by Mac Lyle a.k.a Winther32
 */
@@ -13,13 +21,16 @@ const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+// Google Sheet info for SirAaerios clip library
+const sheet = require('./secrets/sheetID');
+
 // Prefix for the bot command to be triggered
 const prefix = '$';
 const prefix1 = 'c!';
 const fs = require('fs');
 client.commands = new Discord.Collection();
 
-// read in commands in commands dir
+// Read in commands in commands dir
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith(".js"));
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -31,11 +42,12 @@ client.once('ready', () => {
     console.log('Clippy Bot is online!')
 });
 
-// trigger for bot seeing basic commands
+// Trigger for bot seeing basic commands
 client.on('message', message => {
+    // Check if prefix called or message is sent by a bot.
     if((!message.content.toLowerCase().startsWith(prefix) && !message.content.toLowerCase().startsWith(prefix1)) || message.author.bot) return;
     
-    // remove prefix
+    // Remove prefix
     var args; 
     if (message.content.toLowerCase().startsWith(prefix)) {
         args = message.content.slice(prefix.length);
@@ -62,19 +74,25 @@ client.on('message', message => {
     // Log parsed call info
     console.log("Sender:" + sender.username + ", Command:" + command + ", Args:" + args);
 
-    // Debug and basic test commands
-    if (command == 'ping') {
-        message.channel.send('pong');
-    } else if (command == 'whoami') {
-        message.channel.send(sender.username);
-    } 
-    // Help command
-    else if (command == 'help' || command == 'commands') {
+    // Help commands
+    if (command == 'help' || command == 'commands') {
         client.commands.get('help').execute(message, args);
     } else if (command == 'intro') {
         client.commands.get('intro').execute(message);
     }
-    // Hardcode Clip commands
+
+    // Library Commands
+    else if (command == 'library' || command == 'lib') {
+        message.channel.send(sheet.link);
+    } else if (command == 'add') {
+        client.commands.get('add').execute(message, args, sender.username);
+    } else if (command == 'overwrite') {
+        client.commands.get('overwrite').execute(message, args, sender.username);
+    } else if (command == 'lookup') {
+        client.commands.get('lookup').execute(message, args);
+    }
+
+    // Hardcode Clip commands (Server specific)
     else if (command == 'mustard'){
         message.channel.send('https://www.twitch.tv/siraaerios/clip/BumblingLachrymoseFloofM4xHeh?filter=clips&range=all&sort=time');
     } else if (command == 'tarkov') {
@@ -87,7 +105,7 @@ client.on('message', message => {
         message.channel.send("https://clips.twitch.tv/PrettyArtisticTapirPeoplesChamp");
     }
     
-    // Image commands
+    // Image commands (Server specific)
     else if (command == 'angry') {
         message.channel.send('Aaerios ANGRY!', {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785628010665345044/Aaerios_Angry.png"]});
     } else if (command == 'unit') {
@@ -95,20 +113,11 @@ client.on('message', message => {
     } else if (command == 'devil') {
         message.channel.send({files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627918972878868/devil_aaerios.png"]});
     }
-    
-    // Library Commands
-    else if (command == 'songs') {
-        message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
-    } else if (command == 'library' || command == 'lib') {
-        message.channel.send('https://docs.google.com/spreadsheets/d/13NWMHvTFKaaeKlu2u7HOkPT84PT-5ARKpsnHAihU26E/edit?usp=sharing');
-    } else if (command == 'add') {
-        client.commands.get('add').execute(message, args, sender.username);
-    } else if (command == 'overwrite') {
-        client.commands.get('overwrite').execute(message, args, sender.username);
-    } else if (command == 'lookup') {
-        client.commands.get('lookup').execute(message, args);
-    }
 
+    // Misc. commands (Server specific)
+    else if (command == 'songs') { // Server specific command
+        message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
+    }
 });
 
 const access = require("./secrets/discordToken");
