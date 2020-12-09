@@ -1,5 +1,13 @@
 /*
- * Writes over exsiting keywords for a given clip.
+ * Writes over existing keywords for a given clip.
+ *
+ * Verifies link and got at least replacement keywords/phrase.
+ * Linearly searches for a match to the given line in O(N).
+ * 
+ * Once a match is found, the user is asked to verify that they want to 
+ * overwrite the given keywords. This utilizes the reat functionality of 
+ * Discord to gather the yes or no via thumbs up or down emotes.
+ * 
 */
 
 
@@ -69,21 +77,29 @@ module.exports = {
     description: 'overwrite keywords for given clip',
     execute(message, args, username) {
          // Ensure getting new keywords and a link
-         if (args[0] != '') {
-            // get the last argument of the command. Should be clip link
-            const last = args.pop();
-            // Verify link
-            if (last.includes('twitch.tv') && last.includes('clip') && 
-                (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
-                // launch async func
-                (async() => {
-                    await overwrite(message, args, username, last);
-                })();
-            } else {
-                message.channel.send('Invalid format\n**Usage:** $overwrite <comma seperated keywords/phrases>**,** <link>');
-            }
+         // Check for empty args
+        if (args.length == 0) {
+            message.channel.send('Invalid format\n**Usage:** `$overwrite <comma seperated keywords/phrases>, <link>`\n' +
+                                "**Example:** `$overwrite we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+            return;
+        }
+        // Know have at least one arg
+        const last = args.pop(); // link should be last arg given
+        // Assert have at least one keyword.
+        if (args.length == 0) {
+            message.channel.send("At least one unique keyword/phrase to identify the clip followed by a comma and a link to a twitch clip is required.\n" +
+                                "**Example:** `$overwrite we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+            return;
+        }
+        // Verify link
+        if (last.includes('twitch.tv') && last.includes('clip') && 
+            (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
+            // launch async func
+            (async() => {
+                await overwrite(message, args, username, last);
+            })();
         } else {
-            message.channel.send('Invalid format\n**Usage:** $overwrite <comma seperated keywords/phrases>**,** <link>');
+            message.channel.send("Invalid twitch clip link!");
         }
     }
 }

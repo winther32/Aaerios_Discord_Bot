@@ -1,7 +1,8 @@
 /*
- * This is Discord Bot built specifically for SirAaerios's server "The Realm"
+ * This is a Discord Bot built specifically for SirAaerios's server "The Realm"
  *
- * This bot helps to build and manage a community driven library of twitch clips via google sheets.
+ * This bot helps to build and manage a community driven library of twitch clips via Google Sheets.
+ * It also has some fun commands for the community to use.
  * 
  * Built by Mac Lyle a.k.a Winther32
 */
@@ -44,12 +45,19 @@ client.on('message', message => {
     
     // Split command from args
     const command = args.split(/ +/).shift().toLowerCase();
-    // Create args array
-    args = args.slice(command.length+1).split(',');
-    // Trim all the args to clean up
+    // Create args array based on comma seperations
+    args = args.slice(command.length+1).split(/ *,+ */);
+
+    // Clean user input.
+    // Filter out potential holes in args array
+    args = args.filter(function (el) {
+        return (el != null && el != "" && el != NaN);
+    });
+    // Trim all input strings
     for (var i = 0; i < args.length; i++) {
         args[i] = args[i].trim();
     }
+
     var sender = message.author; // User who send the command
     // Log parsed call info
     console.log("Sender:" + sender.username + ", Command:" + command + ", Args:" + args);

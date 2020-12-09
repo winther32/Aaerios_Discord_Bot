@@ -1,7 +1,15 @@
 /*
- * Function to determine if clip is already in the sheet.
+ * Function to determine if clip is already in the sheet and return it's keywords.
+ * OR function searches sheet for keyword matches and returns matching clips
  *
- * If clip in library, returns associated keywords.
+ * 
+ * The lookup by link function is a simple linear search O(N) N=rows
+ * 
+ * The search function is basic and searches the sheet in O(N*M*O(X)) 
+ * N=rows, M=keywords, O(X)=Big O of JS string.includes method
+ * However in practice is expected to run closer to O(N) as M is limited to 5 and 
+ * most rows will be evaluated based on the first keyword check.
+ * 
 */
 
 // init Google sheet access via wrapper 
@@ -38,7 +46,7 @@ async function lookup(message, link) {
         }
     }
     console.log("no clip found in lookup");
-    message.channel.send("This clip is not yet in the database! Feel free to add it with the $add command.");
+    message.channel.send("This clip is not yet in the database! Feel free to add it with the `$add` command.");
 }
 
 // Function to lookup and return a list of clips with given keywords
@@ -50,7 +58,6 @@ async function find(message, args) {
 
     // Get the sheet in spreadsheet
     const sheet = await doc.sheetsByIndex[0];
-
     var rows = await sheet.getRows();
     var results = [];
     var numberOfResults = 0;
@@ -91,11 +98,13 @@ async function find(message, args) {
 
 module.exports = {
     name: 'lookup',
-    description: 'looks up clip in sheet',
+    description: 'looks up or searches clip in sheet',
     execute(message, args) {
-        // Verify got args
-        if (args[0] == '') {
-            message.channel.send('Invalid format\n**Usage:** $lookup <link> **OR** $lookup <comma seperated keywords>');
+        // Verify got correct args for this function. I.E. just a link or comma separated keywords (up to 5)
+        // Check if args are empty
+        if (args.length == 0) {
+            message.channel.send('Invalid format\n**Usage:** `$lookup <link>` **OR** `$lookup <comma seperated keywords>`\n' +
+                                "**Example:** `$lookup www.TwitchClip.com` **OR** `$lookup 50, cry`");
             return;
         }
         // Limiting large amounts of keywords in search.
@@ -104,7 +113,7 @@ module.exports = {
             return;
         }
 
-        var link = args[0]; // Get full link from args
+        var link = args[0]; // Check if first arg is a link. Determines lookup/find method
         // Verfiy link
         if (link.includes('twitch.tv') && link.includes('clip') && 
             (link.startsWith('https://') || link.startsWith('www.') || last.startsWith('twitch.tv'))) {
@@ -114,7 +123,7 @@ module.exports = {
             (async() => {
                 await lookup(message, link);
             })();   
-        } else {
+        } else { // first arg is not a link so must be a keyword
             message.channel.send("Looking for clips with keyword(s): " + args);
             // Start the find function
             (async() => {
