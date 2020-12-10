@@ -22,7 +22,7 @@ module.exports = {
                 {name: 'Images:', value: "`angry`, `unit`, `devil`"},
                 {name: 'Library:', value: "`library`, `songs`, `overwrite`, `add`, `lookup`"},
             )
-            .setFooter("For command recommendations and Q's DM Winther");
+            .setFooter("Created by Winther");
         
         // Clip Library Help embed
         const libEmbed = new Discord.MessageEmbed()
@@ -46,7 +46,7 @@ module.exports = {
                     {name: "The Songs Command:", value: "Our Lord Aaerios has blessed us many a time with his beautiful songs. These have been saved all in one " +
                         "place for your enjoyment at the link provided by `$songs`."}
                 )
-                .setFooter("If you still have questions feel free to DM Winther");
+                .setFooter("Created by Winther");
 
         // Determine which embed to send
         if (args[0].toLowerCase() == "library") {
