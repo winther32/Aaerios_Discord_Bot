@@ -48,10 +48,12 @@ module.exports = {
                 .setFooter("Created by Winther");
 
         // Determine which embed to send
-        if (args[0].toLowerCase() == "library") {
+        if (args.length == 0) {
+            message.channel.send(helpEmbed);
+        } else if (args[0].toLowerCase() == "library") {
             message.channel.send(libEmbed);
         } else {
-            message.channel.send(helpEmbed);
+            message.channel.send("Invalid command.\nTry `$help` or `$help library`.")
         }
     }
 }
