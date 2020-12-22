@@ -23,13 +23,13 @@ Unfortunately this exact bot is set up to be unique to one Discord server and wi
 2. Set up a Google Sheets service account with access to a Google Sheet via Google API console.
 3. Add the Google service account secrets json, Google sheet ID, and Discord bot token to the bot code. 
 
-#### Make your own Discord bot
+### Make your own Discord bot
 Follow https://www.sitepoint.com/discord-bot-node-js/ up to the start of step 4 then just clone this repo instead of theirs. The bot will need access to all the text permissions of the server.
 
-#### Set up your Google Sheet backend
+### Set up your Google Sheet backend
 Follow https://support.google.com/a/answer/7378726?hl=en and select the Sheets API for the service account. You will then have to add the service account email as an editor to the sheet. Download the API secret json.
 
-#### Integrate backend into code
+### Integrate backend into code
 1. You will need to add your bot token to the last line in main.js.
 2. Put the secrets json in the commands folder. In the add.js, lookup.js, and overwrite.js files, you will need to replace paths in the creds and sheet variables with your own sheet manager json and sheet ID (the ID is just part of the Google sheet URL).
 
