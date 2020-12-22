@@ -18,11 +18,10 @@ The main reason behind using Google Sheets is that I wanted this library of clip
 Some drawbacks of using Google Sheets as a database are the speed and lack of common database features. However, as long as the number of rows (clips uploaded) remain relatively small the linear searche algorithm will give decent performance. 
 
 ## How can I add this bot to my Discord server?
-Unfortunately this exact bot is set up to be unique to one Discord server and will require some very basic coding to set up on another server. There are 4 main steps required: 
-1. Create your own Discord bot via the Discord dev console.
+Unfortunately this exact bot is set up to be unique to one Discord server and will require some very basic coding to set up on another server. There are 3 main steps required: 
+1. Create your own Discord bot via the Discord dev console and add it to your server.
 2. Set up a Google Sheets service account with access to a Google Sheet via Google API console.
 3. Add the Google service account secrets json, Google sheet ID, and Discord bot token to the bot code. 
-4. Add it to your server!
 
 #### Make your own Discord bot
 Follow https://www.sitepoint.com/discord-bot-node-js/ up to the start of step 4 then just clone this repo instead of theirs. The bot will need access to all the text permissions of the server.
