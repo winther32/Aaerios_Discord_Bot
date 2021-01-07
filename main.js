@@ -112,6 +112,8 @@ client.on('message', message => {
         message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627801332088852/swol_aaerios.jpg"]});
     } else if (command == 'devil') {
         message.channel.send({files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627918972878868/devil_aaerios.png"]});
+    } else if (command == 'nom') {
+        message.channel.send({files: ["https://cdn.discordapp.com/attachments/708925850690650166/796615093629747220/qlufpuswmn921.png"]});
     }
 
     // Misc. commands (Server specific)
