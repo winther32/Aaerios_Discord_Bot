@@ -97,6 +97,7 @@ client.on('message', message => {
             client.commands.get('overwrite').execute(message, args, sender.username);
             break;
         case 'lookup':
+        case 'search':
             client.commands.get('lookup').execute(message, args);
             break;
 

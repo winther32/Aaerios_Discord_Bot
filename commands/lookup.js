@@ -36,7 +36,7 @@ async function lookup(message, link) {
     // gets unique twitch clip code from link
     // e.g. https://www.twitch.tv/siraaerios/clip/SpotlessCourageousNoodleMVGame?filter=clips&range=7d&sort=time
     // into SpotlessCourageousNoodleMVGame
-    var key = link.split('/').pop().split('?')[0]; 
+    var key = link.split('/').pop().split('?')[0];
     // Linear loop to find match if exists
     for (i = 0; i < rows.length; i++) {
         if (rows[i].Clip.includes(key)) {
