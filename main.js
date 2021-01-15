@@ -17,7 +17,7 @@
 
 
 // Init discord sdk
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
+// const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
@@ -70,9 +70,9 @@ client.on('message', message => {
         args[i] = args[i].trim();
     }
 
-    var sender = message.author; // User who send the command
+    var username = message.author.username; // User who send the command
     // Log parsed call info
-    console.log("Sender:" + sender.username + ", Command:" + command + ", Args:" + args);
+    console.log("Sender:" + username + ", Command:" + command + ", Args:" + args);
 
     
     switch (command) {
@@ -91,14 +91,17 @@ client.on('message', message => {
             message.channel.send(sheet.link);
             break;
         case 'add':
-            client.commands.get('add').execute(message, args, sender.username);
+            client.commands.get('add').execute(message, args, username);
             break;
         case 'overwrite':
-            client.commands.get('overwrite').execute(message, args, sender.username);
+            client.commands.get('overwrite').execute(message, args);
             break;
         case 'lookup':
         case 'search':
             client.commands.get('lookup').execute(message, args);
+            break;
+        case 'sync':
+            client.commands.get('sync').execute(message, args);
             break;
 
         // Hardcode Clip commands (Server specific)

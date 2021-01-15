@@ -37,20 +37,33 @@ function addLookupDB(message, keywords, username, link) {
             ":key": twitchID
         }
     }
+
     // Query the DB to check for duplicates
     docClient.query(qParams, (error, data) => {
         if (error) {
             // Failure to complete the query
-            console.log("Error: Unable to query lookup table. " + error);
+            console.error("Error: Unable to query lookup table. " + error);
+            message.channel.send("Something went wrong! Unable to add clip.");
         } else {
             // Successful query
             console.log("Query success");
             if (data.Count == 0) {
-                // Clip not already in the DB. Run function to add it to DB
-                enterData(keywords, username, link, twitchID);
+                // Clip not in the DB. Run function to add it to DB
+                try {
+                    enterData(keywords, username, link, twitchID);
+                    // Launch Async function to add to Google Sheet.
+                    (async() => {
+                        await addToSheet(message, keywords, username, link);
+                    })();
+                } catch(err) {
+                    message.channel.send("Something went wrong! Unable to add clip.");
+                    console.warn("Potential desync of Dynamo lookup table and google sheet. Verify in log.");
+                    return;
+                }
             } else {
                 // Entry already in the lookup DB
                 console.log("Clip already in DB.");
+                message.channel.send('This clip is already in the database! It\'s keywords are: ' + data.Items[0].info.keywords);
             }
         }
     })
@@ -61,14 +74,11 @@ function addLookupDB(message, keywords, username, link) {
         console.log("Attempting to add entry to lookup DB.");
         // Object to hold all the data as a value
         let data = {};
-
-        // Build the object
+        // Build the info object
         data.link = link;
         data.author = username;
         data.date = Date.now(); // Date as number (unix time)
         data.keywords = keywords;
-
-        // console.log(data);
 
         // Set up the params for Dynamo to save to table
         const params = {
@@ -81,23 +91,29 @@ function addLookupDB(message, keywords, username, link) {
             }
         }
 
-        // Actually put value into table
-        docClient.put(params, (error => {
-            if (error) {
-                // Failure message and log
-                console.log("Error: Unable to save to DB via add command." + error);
-                // throw "Error: Unable to save to DB. " + error;
-            } else {
-                // Success message and log
-                console.log("Successfully added entry to DB.");
-            }
-        }))
+        try {
+            // Actually put value into table
+            docClient.put(params, (error => {
+                if (error) {
+                    // Failure message and log
+                    console.error("Error: Unable to save to DB via add command." + error);
+                    throw "Unable to add to DB";
+                } else {
+                    // Success message and log
+                    console.log("Successfully added entry to DB:" + twitchID);
+                    // Wait to send once added to the sheet since that is what is visible to user.
+                    // message.channel.send("Clip successfully added!"); 
+                }
+            }))
+        } catch(err) {
+            throw err;
+        }
     }   
 }
 
 
 // Function to use google API and access sheet
-async function addToSheet(message, args, username, link) {
+async function addToSheet(message, keywords, username, link) {
     // Authenticate with the Google Spreadsheets API.
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
@@ -105,19 +121,8 @@ async function addToSheet(message, args, username, link) {
     // Get the sheet in spreadsheet
     const sheet = await doc.sheetsByIndex[0];
 
-    message.channel.send('Checking for duplicates...')
-    var rows = await sheet.getRows();
-    // gets unique twitch clip code from link
-    var key = link.split('/').pop().split('?')[0]; 
-    // For loop to check for dupicate links
-    for (var i = 0; i < rows.length; i++) {
-        if (rows[i].Clip.includes(key)) {
-            console.log('Found duplicate link ' + rows[i].Clip);
-            var keywords = rows[i].Keywords;
-            message.channel.send('This clip is already in the database! It\'s keywords are: ' + keywords);
-            return; // If find a match end function without adding.
-        }
-    }
+    // Get the unique twitchID
+    const twitchID = link.split('/').pop().split('?')[0];
 
     // Get today's date in a human readable string
     var today = new Date();
@@ -127,16 +132,18 @@ async function addToSheet(message, args, username, link) {
     today = mm + '/' + dd + '/' + yyyy; 
 
     // Create array which will be pushed into next row available
-    const rowArray = [args.join().toLowerCase()];
+    const rowArray = [keywords.join().toLowerCase()];
     rowArray.push(username);
     rowArray.push(today);
     rowArray.push(link); 
 
     // Write array into next available row
     const newRow = await sheet.addRow(rowArray);
-    message.channel.send('Clip added!')
-    console.log('Clip added to sheet: ' + link);
+    console.log('Clip added to Google Sheet: ' + twitchID);
+    // Confirmation message is sent only once clip is added to place where user can see it (Google Sheet)
+    message.channel.send("Clip successfully added!"); 
 }
+
 
 module.exports = {
     name: 'add',
@@ -161,13 +168,8 @@ module.exports = {
         if (last.includes('twitch.tv') && last.includes('clip') && 
             (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
             // args have been validated by now
-
-            // message.channel.send('Attempting to add clip to database...');
-            // // Launch Async function to interact w/Google API 
-            // (async() => {
-            //     await addToSheet(message, args, username, last);
-            // })();
-
+            message.channel.send("Attempting to add clip...");
+            // Launch function to add to DB and Sheet
             addLookupDB(message, args, username, last);
         } else {
             message.channel.send("Invalid twitch clip link!");

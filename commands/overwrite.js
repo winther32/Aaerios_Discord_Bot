@@ -15,12 +15,12 @@
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 var creds = require('../secrets/client_secret.json'); // Sheet manager creds
-var sheet = require('../secrets/sheetID'); // Lib sheet ID
+var sheetInfo = require('../secrets/sheetID'); // Lib sheet ID
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
-const doc = new GoogleSpreadsheet(sheet.ID);
+const doc = new GoogleSpreadsheet(sheetInfo.ID);
 
-// Function to async access sheet with google apis
-async function overwrite(message, args, username, link) {
+// Function to async access sheet with google APIs
+async function overwrite(message, args, link) {
     // Authenticate with the Google Spreadsheets API.
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
@@ -76,7 +76,7 @@ async function overwrite(message, args, username, link) {
 module.exports = {
     name: 'overwrite',
     description: 'overwrite keywords for given clip',
-    execute(message, args, username) {
+    execute(message, args) {
          // Ensure getting new keywords and a link
          // Check for empty args
         if (args.length == 0) {
@@ -97,7 +97,7 @@ module.exports = {
             (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
             // launch async func
             (async() => {
-                await overwrite(message, args, username, last);
+                await overwrite(message, args, last);
             })();
         } else {
             message.channel.send("Invalid twitch clip link!");
