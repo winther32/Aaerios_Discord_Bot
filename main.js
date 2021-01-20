@@ -42,9 +42,9 @@ client.once('ready', () => {
     console.log('Clippy Bot is online!')
 });
 
-// Trigger for bot seeing basic commands
+// Trigger for on message events.
 client.on('message', message => {
-    // Check if prefix called or message is sent by a bot.
+    // Check if prefix called or message is sent by a bot. (validation of bot call)
     if((!message.content.toLowerCase().startsWith(prefix) && !message.content.toLowerCase().startsWith(prefix1)) || message.author.bot) return;
     
     // Remove prefix
@@ -65,12 +65,13 @@ client.on('message', message => {
     args = args.filter(function (el) {
         return (el != null && el != "" && el != NaN);
     });
-    // Trim all input strings
+    // Trim all input strings and to lower case
     for (var i = 0; i < args.length; i++) {
         args[i] = args[i].trim();
     }
+    // Expected args form: [this,is,an,example form of,args,www.LinkToSite.com]
 
-    var username = message.author.username; // User who send the command
+    var username = message.author.username; // User who sent the command
     // Log parsed call info
     console.log("Sender:" + username + ", Command:" + command + ", Args:" + args);
 

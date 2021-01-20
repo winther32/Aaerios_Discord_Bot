@@ -20,35 +20,50 @@ var sheet = require('../secrets/sheetID'); // Lib sheet ID
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 const doc = new GoogleSpreadsheet(sheet.ID);
 
-// Function to access sheet via google api
-async function lookup(message, link) {
-    console.log("Begin lookup call");
-    // Auth
-    await doc.useServiceAccountAuth(creds);
-    await doc.loadInfo();
+// init AWS DynamoDB access and doc client
+const awsCreds = require('../secrets/awsEnv'); // AWS env values
+const AWS = require('aws-sdk');
+AWS.config.update({
+    region: awsCreds.AWS_REGION,
+    accessKeyId: awsCreds.AWS_KEY_ID,
+    secretAccessKey: awsCreds.AWS_SECRET_KEY
+})
+const docClient = new AWS.DynamoDB.DocumentClient();
 
-    // Get the sheet in spreadsheet
-    const sheet = await doc.sheetsByIndex[0];
+function lookup(message, link) {
+    // Get unique twitchID from link
+    const twitchID = link.split('/').pop().split('?')[0];
+    console.log("Querying lookup DB... Key: " + twitchID);
 
-    // For loop to check for dupicate links
-    var rows = await sheet.getRows();
-    var i;
-    // gets unique twitch clip code from link
-    // e.g. https://www.twitch.tv/siraaerios/clip/SpotlessCourageousNoodleMVGame?filter=clips&range=7d&sort=time
-    // into SpotlessCourageousNoodleMVGame
-    var key = link.split('/').pop().split('?')[0];
-    // Linear loop to find match if exists
-    for (i = 0; i < rows.length; i++) {
-        if (rows[i].Clip.includes(key)) {
-            console.log('lookup success');
-            var keywords = rows[i].Keywords;
-            message.channel.send('**This clip is already in the database!\nIt\'s keywords are: **' + keywords);
-            return;
+    // Duplicate query params
+    var qParams = {
+        TableName: 'discord-clip-lookup',
+        KeyConditionExpression: "id = :key",
+        ExpressionAttributeValues:{
+            ":key": twitchID
         }
     }
-    console.log("no clip found in lookup");
-    message.channel.send("This clip is not yet in the database! Feel free to add it with the `$add` command.");
+
+     // Query the DB to check for duplicates
+     docClient.query(qParams, (error, data) => {
+        if (error) {
+            // Failure to complete the query
+            console.error("Error: Unable to query lookup table for lookup. " + error);
+            message.channel.send("Something went wrong! Unable to find clip.");
+        } else {
+            // Successful query
+            console.log("Query success. Key:" + twitchID);
+            if (data.Count == 0) {
+                // Clip not in DB
+                message.channel.send("This clip is not yet in the database! Feel free to add it with the `$add` command.");
+            } else {
+                // Entry already in the lookup DB
+                message.channel.send('**Found the Clip!\nIt\'s keywords are: **' + data.Items[0].info.keywords);
+            }
+        }
+    });
 }
+
 
 // Function to lookup and return a list of clips with given keywords
 // This is a basic search algorithm. O(N*M) N=rows in database, M=args given
@@ -121,9 +136,7 @@ module.exports = {
             // placeholder for google addition api
             message.channel.send('Looking up clip in database...');
             // Launch function to lookup
-            (async() => {
-                await lookup(message, link);
-            })();   
+            lookup(message, link);   
         } else { // first arg is not a link so must be a keyword
             message.channel.send("Looking for clips with keyword(s): " + args);
             // Start the find function

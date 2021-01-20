@@ -26,6 +26,7 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 
 // Adding the entry into a DynamoDB for lookup. Key by twitchID 
 function addLookupDB(message, keywords, username, link) {
+    console.log("Begin add...querying lookup DB.");
     // Get unique id from twitch clip url
     const twitchID = link.split('/').pop().split('?')[0];
     
@@ -42,87 +43,78 @@ function addLookupDB(message, keywords, username, link) {
     docClient.query(qParams, (error, data) => {
         if (error) {
             // Failure to complete the query
-            console.error("Error: Unable to query lookup table. " + error);
+            console.error("Error: Unable to query lookup table for add. " + error);
             message.channel.send("Something went wrong! Unable to add clip.");
         } else {
             // Successful query
             console.log("Query success");
             if (data.Count == 0) {
                 // Clip not in the DB. Run function to add it to DB
-                try {
-                    enterData(keywords, username, link, twitchID);
-                    // Launch Async function to add to Google Sheet.
-                    (async() => {
-                        await addToSheet(message, keywords, username, link);
-                    })();
-                } catch(err) {
+                addToSheet(message, keywords, username, link, twitchID).then( () => {
+                    return enterData(keywords, username, link, twitchID)
+                }).then( () => {
+                     // Confirmation message is sent only once clip is added to both Sheet and DB
+                    message.channel.send("Clip successfully added!");
+                }).catch( err => {
+                    // Failure in one of the add calls
                     message.channel.send("Something went wrong! Unable to add clip.");
-                    console.warn("Potential desync of Dynamo lookup table and google sheet. Verify in log.");
-                    return;
-                }
+                    console.warn("Potential desync of Dynamo lookup table and google sheet. Key:" + twitchID + err);
+                    // TODO: Error correction. determine if wrote to sheet and not db. attempt to resync.
+                });
             } else {
                 // Entry already in the lookup DB
                 console.log("Clip already in DB.");
-                message.channel.send('This clip is already in the database! It\'s keywords are: ' + data.Items[0].info.keywords);
+                message.channel.send('**This clip is already in the database!\n It\'s keywords are: **' + data.Items[0].info.keywords);
             }
         }
-    })
-
-
-    // Function to enter entry data into the DB
-    function enterData(keywords, username, link, twitchID) {
-        console.log("Attempting to add entry to lookup DB.");
-        // Object to hold all the data as a value
-        let data = {};
-        // Build the info object
-        data.link = link;
-        data.author = username;
-        data.date = Date.now(); // Date as number (unix time)
-        data.keywords = keywords;
-
-        // Set up the params for Dynamo to save to table
-        const params = {
-            TableName: 'discord-clip-lookup',
-            Item: {
-                // unique key for table
-                id: twitchID,
-                // where the data is stored (value)
-                info: data
-            }
-        }
-
-        try {
-            // Actually put value into table
-            docClient.put(params, (error => {
-                if (error) {
-                    // Failure message and log
-                    console.error("Error: Unable to save to DB via add command." + error);
-                    throw "Unable to add to DB";
-                } else {
-                    // Success message and log
-                    console.log("Successfully added entry to DB:" + twitchID);
-                    // Wait to send once added to the sheet since that is what is visible to user.
-                    // message.channel.send("Clip successfully added!"); 
-                }
-            }))
-        } catch(err) {
-            throw err;
-        }
-    }   
+    });
 }
 
 
+// Function to enter entry data into the DB
+function enterData(keywords, username, link, twitchID) {
+    console.log("Attempting to add entry to lookup DB.");
+    // Object to hold all the data as a value
+    let data = {};
+    // Build the info object
+    data.link = link;
+    data.author = username;
+    data.date = Date.now(); // Date as number (unix time)
+    data.keywords = keywords;
+
+    // Set up the params for Dynamo to save to table
+    const params = {
+        TableName: 'discord-clip-lookup',
+        Item: {
+            // unique key for table
+            id: twitchID,
+            // where the data is stored (value)
+            info: data
+        }
+    }
+
+    // Actually put value into table
+    docClient.put(params, (error => {
+        if (error) {
+            // Failure log. Throw error.
+            console.error("Error: Unable to save to DB via add command." + error);
+            throw "Unable to add to DB." + error;
+        } else {
+            // Success log
+            console.log("DB add success:" + twitchID);
+        }
+    }));
+}   
+
+
 // Function to use google API and access sheet
-async function addToSheet(message, keywords, username, link) {
+async function addToSheet(message, keywords, username, link, twitchID) {
     // Authenticate with the Google Spreadsheets API.
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
 
     // Get the sheet in spreadsheet
-    const sheet = await doc.sheetsByIndex[0];
-
-    // Get the unique twitchID
-    const twitchID = link.split('/').pop().split('?')[0];
+    const sheet = doc.sheetsByIndex[0];
 
     // Get today's date in a human readable string
     var today = new Date();
@@ -132,16 +124,15 @@ async function addToSheet(message, keywords, username, link) {
     today = mm + '/' + dd + '/' + yyyy; 
 
     // Create array which will be pushed into next row available
-    const rowArray = [keywords.join().toLowerCase()];
+    const rowArray = [keywords.join()];
     rowArray.push(username);
     rowArray.push(today);
     rowArray.push(link); 
 
     // Write array into next available row
     const newRow = await sheet.addRow(rowArray);
-    console.log('Clip added to Google Sheet: ' + twitchID);
-    // Confirmation message is sent only once clip is added to place where user can see it (Google Sheet)
-    message.channel.send("Clip successfully added!"); 
+    console.log('Sheet add successfull: ' + twitchID);
+   
 }
 
 
@@ -167,7 +158,8 @@ module.exports = {
         // Verify that clip is valid link and from twitch
         if (last.includes('twitch.tv') && last.includes('clip') && 
             (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
-            // args have been validated by now
+            // args have been validated, now only keywords. Make all keywords lowercase.
+            args = args.map(el => el.toLowerCase());
             message.channel.send("Attempting to add clip...");
             // Launch function to add to DB and Sheet
             addLookupDB(message, args, username, last);

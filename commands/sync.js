@@ -37,6 +37,8 @@ async function sheet2db() {
     var twitchID;
     var keywords;
     var author;
+
+    // Begin recursive scan function.
     start(scanned, () => {
         // Log results of run.
         console.log("Scanned " + scanned + ". Added " + newEntries + " to DB.");
@@ -107,9 +109,9 @@ function dbQueryAdd(twitchID, link, author, keywords, _callback) {
                 // Actually put value into table
                 docClient.put(params, (error => {
                     if (error) {
-                        // Failure message and log
+                        // Failure log
                         console.error("Error: Unable to save to DB." + error);
-                        throw "Unable to add to DB";
+                        // throw "Unable to add to DB"; // No catch yet.
                     } else {
                         // Success message and log
                         console.log("Successfully added entry to DB:" + twitchID);
