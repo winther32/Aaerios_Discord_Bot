@@ -111,7 +111,6 @@ function dbQueryAdd(twitchID, link, author, keywords, _callback) {
                     if (error) {
                         // Failure log
                         console.error("Error: Unable to save to DB." + error);
-                        // throw "Unable to add to DB"; // No catch yet.
                     } else {
                         // Success message and log
                         console.log("Successfully added entry to DB:" + twitchID);

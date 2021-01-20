@@ -89,16 +89,11 @@ function verify(message, oldKeywords, newKeywords, twitchID) {
                  // Launch function to overwrite keywords in the Sheet. On completion try overwrite to DB.
                 overwriteSheet(newKeywords, twitchID).then( () => { 
                     // OverwriteDB func
-                    overwriteDB(newKeywords, twitchID)
-                }).then( () => {
-                    // After both Sheet and DB have successful writes, notify user.
-                    message.channel.send('Overwrite complete!');
-                    console.log("Overwrite finished. Key: " + twitchID);
+                    overwriteDB(message, newKeywords, twitchID)
                 }).catch(err => {
-                    // Failure of one of the overwrite calls
+                    // Failure of the sheet overwrite call
                     message.channel.send("Something went wrong! Unable to update clip."); 
-                    console.warn("Overwrite failure. Key:" + twitchID + "Error:" + err);
-                    // TODO: insert some type of error correcting function. IE if sheet wrote but Dynamo failed.
+                    console.warn("Overwrite failure in sheet DB not executed. Key:" + twitchID + "Error:" + err);           
                 });
             } else {
                 // Cancel overwrite
@@ -116,7 +111,7 @@ function verify(message, oldKeywords, newKeywords, twitchID) {
 
 
 // Overwrite the keywords in the lookup DB with new keywords. O(1)
-function overwriteDB(newKeywords, twitchID) {
+function overwriteDB(message, newKeywords, twitchID) {
     // Update params
     var params = {
         TableName:  'discord-clip-lookup',
@@ -134,11 +129,15 @@ function overwriteDB(newKeywords, twitchID) {
     docClient.update(params, (error) => {
         if (error) {
             // Overwrite in Dynamo failure
-            // console.error("Unable to overwrite DB. Key:" + twitchID + "Err: " + error);
-            throw "Unable to overwrite DB. Key:" + twitchID + " Err: " + error;
+            console.error("Unable to overwrite DB. Key:" + twitchID + "Err: " + error);
+            message.channel.send("Something went wrong! Unable to update clip."); 
+            // TODO error correction triggered here. In sheet but not DB.
         } else {
             // Overwrite of DB is a success
             console.log("DB ovewrite successful " + twitchID);
+            // Log end of overwrite since called after sheet overwrite
+            console.log("Overwrite finished. Key: " + twitchID);
+            message.channel.send('Overwrite complete!');
         }
     })
 }

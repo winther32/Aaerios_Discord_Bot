@@ -51,15 +51,11 @@ function addLookupDB(message, keywords, username, link) {
             if (data.Count == 0) {
                 // Clip not in the DB. Run function to add it to DB
                 addToSheet(message, keywords, username, link, twitchID).then( () => {
-                    return enterData(keywords, username, link, twitchID)
-                }).then( () => {
-                     // Confirmation message is sent only once clip is added to both Sheet and DB
-                    message.channel.send("Clip successfully added!");
+                    enterData(message, keywords, username, link, twitchID)
                 }).catch( err => {
-                    // Failure in one of the add calls
+                    // Failure in sheet add. DB call not executed then.
                     message.channel.send("Something went wrong! Unable to add clip.");
-                    console.warn("Potential desync of Dynamo lookup table and google sheet. Key:" + twitchID + err);
-                    // TODO: Error correction. determine if wrote to sheet and not db. attempt to resync.
+                    console.warn("Add failure in sheet DB not executed. Key:" + twitchID + err);
                 });
             } else {
                 // Entry already in the lookup DB
@@ -72,7 +68,7 @@ function addLookupDB(message, keywords, username, link) {
 
 
 // Function to enter entry data into the DB
-function enterData(keywords, username, link, twitchID) {
+function enterData(message, keywords, username, link, twitchID) {
     console.log("Attempting to add entry to lookup DB.");
     // Object to hold all the data as a value
     let data = {};
@@ -97,11 +93,15 @@ function enterData(keywords, username, link, twitchID) {
     docClient.put(params, (error => {
         if (error) {
             // Failure log. Throw error.
-            console.error("Error: Unable to save to DB via add command." + error);
-            throw "Unable to add to DB." + error;
+            console.error("Unable to add to DB." + error);
+            message.channel.send("Something went wrong! Unable to add clip.");
+            // TODO error correction starts here. Clip in Sheet but not in DB.
         } else {
             // Success log
             console.log("DB add success:" + twitchID);
+            // Send completion message. Here since this executes after sheet.
+            console.log("Add complete. Key: " + twitchID); 
+            message.channel.send("Clip successfully added!");
         }
     }));
 }   

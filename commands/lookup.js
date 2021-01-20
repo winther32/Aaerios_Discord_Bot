@@ -135,7 +135,7 @@ module.exports = {
             (link.startsWith('https://') || link.startsWith('www.') || last.startsWith('twitch.tv'))) {
             // placeholder for google addition api
             message.channel.send('Looking up clip in database...');
-            // Launch function to lookup
+            // Launch function to lookup O(1)
             lookup(message, link);   
         } else { // first arg is not a link so must be a keyword
             message.channel.send("Looking for clips with keyword(s): " + args);
