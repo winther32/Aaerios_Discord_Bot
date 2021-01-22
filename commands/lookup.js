@@ -12,6 +12,9 @@
  * 
 */
 
+// Performance logging
+const { PerformanceObserver, performance } = require('perf_hooks');
+
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -22,6 +25,9 @@ const doc = new GoogleSpreadsheet(sheet.ID);
 
 // Function to access sheet via google api
 async function lookup(message, link) {
+    // Performance logging
+    var start = performance.now();
+
     console.log("Begin lookup call");
     // Auth
     await doc.useServiceAccountAuth(creds);
@@ -43,11 +49,18 @@ async function lookup(message, link) {
             console.log('lookup success');
             var keywords = rows[i].Keywords;
             message.channel.send('**This clip is already in the database!\nIt\'s keywords are: **' + keywords);
+
+            // Performance logging
+            var stop = performance.now();
+            console.log("Lookup took " + (stop-start));
             return;
         }
     }
     console.log("no clip found in lookup");
     message.channel.send("This clip is not yet in the database! Feel free to add it with the `$add` command.");
+    // Performance logging
+    var stop = performance.now();
+    console.log("Lookup took " + (stop-start));
 }
 
 // Function to lookup and return a list of clips with given keywords
