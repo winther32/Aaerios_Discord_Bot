@@ -12,6 +12,9 @@
  * 
 */
 
+// Performance API
+const { PerformanceObserver, performance } = require('perf_hooks');
+
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -31,6 +34,9 @@ AWS.config.update({
 const docClient = new AWS.DynamoDB.DocumentClient();
 
 function lookup(message, link) {
+    // Performance logging
+    // var start = performance.now();
+
     // Get unique twitchID from link
     const twitchID = link.split('/').pop().split('?')[0];
     console.log("Querying lookup DB... Key: " + twitchID);
@@ -56,9 +62,17 @@ function lookup(message, link) {
             if (data.Count == 0) {
                 // Clip not in DB
                 message.channel.send("This clip is not yet in the database! Feel free to add it with the `$add` command.");
+
+                // Performance logging
+                // var stop = performance.now();
+                // console.log("Lookup call took " + (stop-start) +  " milliseconds.");
             } else {
                 // Entry already in the lookup DB
                 message.channel.send('**Found the Clip!\nIt\'s keywords are: **' + data.Items[0].info.keywords);
+                
+                // Performance logging
+                // var stop = performance.now();
+                // console.log("Lookup call took " + (stop-start) +  " milliseconds.");
             }
         }
     });
