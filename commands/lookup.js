@@ -33,7 +33,7 @@ AWS.config.update({
 })
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-function lookup(message, link) {
+function lookupLink(message, link) {
     // Performance logging
     // var start = performance.now();
 
@@ -82,7 +82,7 @@ function lookup(message, link) {
 // Function to lookup and return a list of clips with given keywords
 // This is a basic search algorithm. O(N*M) N=rows in database, M=args given
 // Realistically, in practice expect to get much closer to O(N) time.
-async function find(message, args) {
+async function keywordSearch(message, args) {
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
 
@@ -150,12 +150,12 @@ module.exports = {
             // placeholder for google addition api
             message.channel.send('Looking up clip in database...');
             // Launch function to lookup O(1)
-            lookup(message, link);   
+            lookupLink(message, link);   
         } else { // first arg is not a link so must be a keyword
             message.channel.send("Looking for clips with keyword(s): " + args);
             // Start the find function
             (async() => {
-                await find(message, args);
+                await keywordSearch(message, args);
             })();
         }
     }
