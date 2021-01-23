@@ -17,7 +17,7 @@
 
 
 // Init discord sdk
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
+// const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
@@ -42,9 +42,9 @@ client.once('ready', () => {
     console.log('Clippy Bot is online!')
 });
 
-// Trigger for bot seeing basic commands
+// Trigger for on message events.
 client.on('message', message => {
-    // Check if prefix called or message is sent by a bot.
+    // Check if prefix called or message is sent by a bot. (validation of bot call)
     if((!message.content.toLowerCase().startsWith(prefix) && !message.content.toLowerCase().startsWith(prefix1)) || message.author.bot) return;
     
     // Remove prefix
@@ -65,60 +65,84 @@ client.on('message', message => {
     args = args.filter(function (el) {
         return (el != null && el != "" && el != NaN);
     });
-    // Trim all input strings
+    // Trim all input strings and to lower case
     for (var i = 0; i < args.length; i++) {
         args[i] = args[i].trim();
     }
+    // Expected args form: [this,is,an,example form of,args,www.LinkToSite.com]
 
-    var sender = message.author; // User who send the command
+    var username = message.author.username; // User who sent the command
     // Log parsed call info
-    console.log("Sender:" + sender.username + ", Command:" + command + ", Args:" + args);
+    console.log("Sender:" + username + ", Command:" + command + ", Args:" + args);
 
-    // Help commands
-    if (command == 'help' || command == 'commands') {
-        client.commands.get('help').execute(message, args);
-    } else if (command == 'intro') {
-        client.commands.get('intro').execute(message);
-    }
-
-    // Library Commands
-    else if (command == 'library' || command == 'lib') {
-        message.channel.send(sheet.link);
-    } else if (command == 'add') {
-        client.commands.get('add').execute(message, args, sender.username);
-    } else if (command == 'overwrite') {
-        client.commands.get('overwrite').execute(message, args, sender.username);
-    } else if (command == 'lookup') {
-        client.commands.get('lookup').execute(message, args);
-    }
-
-    // Hardcode Clip commands (Server specific)
-    else if (command == 'mustard'){
-        message.channel.send('https://www.twitch.tv/siraaerios/clip/BumblingLachrymoseFloofM4xHeh?filter=clips&range=all&sort=time');
-    } else if (command == 'tarkov') {
-        message.channel.send('https://www.twitch.tv/siraaerios/clip/AuspiciousCuriousTitanCopyThis?filter=clips&range=all&sort=time');
-    } else if (command == 'milk') {
-        message.channel.send('https://www.twitch.tv/siraaerios/clip/PhilanthropicJoyousFriseeRitzMitz?filter=clips&range=all&sort=time');
-    } else if (command == 'salsa') {
-        message.channel.send("https://www.twitch.tv/siraaerios/clip/GrotesqueHorribleDogPupper?filter=clips&range=all&sort=time");
-    } else if (command == 'yogurt') {
-        message.channel.send("https://clips.twitch.tv/PrettyArtisticTapirPeoplesChamp");
-    }
     
-    // Image commands (Server specific)
-    else if (command == 'angry') {
-        message.channel.send('Aaerios ANGRY!', {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785628010665345044/Aaerios_Angry.png"]});
-    } else if (command == 'unit') {
-        message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627801332088852/swol_aaerios.jpg"]});
-    } else if (command == 'devil') {
-        message.channel.send({files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627918972878868/devil_aaerios.png"]});
-    } else if (command == 'nom') {
-        message.channel.send({files: ["https://cdn.discordapp.com/attachments/708925850690650166/796615093629747220/qlufpuswmn921.png"]});
-    }
+    switch (command) {
+        // Help commands
+        case 'help':
+        case 'commands':
+            client.commands.get('help').execute(message, args);
+            break;
+        case 'intro':
+            client.commands.get('intro').execute(message);
+            break;
 
-    // Misc. commands (Server specific)
-    else if (command == 'songs') { // Server specific command
-        message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
+        // Library Commands
+        case 'library':
+        case 'lib':
+            message.channel.send(sheet.link);
+            break;
+        case 'add':
+            client.commands.get('add').execute(message, args, username);
+            break;
+        case 'overwrite':
+            client.commands.get('overwrite').execute(message, args);
+            break;
+        case 'lookup':
+        case 'search':
+            client.commands.get('lookup').execute(message, args);
+            break;
+        case 'sync':
+            client.commands.get('sync').execute(message, args);
+            break;
+
+        // Hardcode Clip commands (Server specific)
+        case 'mustard':
+            message.channel.send('https://www.twitch.tv/siraaerios/clip/BumblingLachrymoseFloofM4xHeh?filter=clips&range=all&sort=time');
+            break;
+        case 'tarkov':
+            message.channel.send('https://www.twitch.tv/siraaerios/clip/AuspiciousCuriousTitanCopyThis?filter=clips&range=all&sort=time');
+            break;
+        case 'milk':
+            message.channel.send('https://www.twitch.tv/siraaerios/clip/PhilanthropicJoyousFriseeRitzMitz?filter=clips&range=all&sort=time');
+            break;
+        case 'salsa':
+            message.channel.send("https://www.twitch.tv/siraaerios/clip/GrotesqueHorribleDogPupper?filter=clips&range=all&sort=time");
+            break;
+        case 'yogurt':
+            message.channel.send("https://clips.twitch.tv/PrettyArtisticTapirPeoplesChamp");
+            break;
+
+        // Image commands (Server specific)
+        case 'angry':
+            message.channel.send('Aaerios ANGRY!', {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785628010665345044/Aaerios_Angry.png"]});
+            break;
+        case 'unit':
+            message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627801332088852/swol_aaerios.jpg"]});
+            break;
+        case 'devil':
+            message.channel.send({files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627918972878868/devil_aaerios.png"]});
+            break;
+        case 'nom':
+            message.channel.send({files: ["https://cdn.discordapp.com/attachments/708925850690650166/796615093629747220/qlufpuswmn921.png"]});
+            break;
+
+        // Misc. commands (Server specific)
+        case 'songs':
+            message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
+            break;
+
+        default:
+            break;
     }
 });
 
