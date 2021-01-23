@@ -3,7 +3,7 @@
  * OR function searches sheet for keyword matches and returns matching clips
  *
  * 
- * The lookup by link function is a simple linear search O(N) N=rows
+ * The lookup by link function uses DynamoDb query and runs in O(1)
  * 
  * The search function is basic and searches the sheet in O(N*M*O(X)) 
  * N=rows, M=keywords, O(X)=Big O of JS string.includes method
@@ -13,7 +13,7 @@
 */
 
 // Performance API
-const { PerformanceObserver, performance } = require('perf_hooks');
+// const { PerformanceObserver, performance } = require('perf_hooks');
 
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/

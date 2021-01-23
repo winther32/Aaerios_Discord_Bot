@@ -1,10 +1,10 @@
 /*
  * Writes over existing keywords for a given clip.
  *
- * Verifies link and got at least replacement keywords/phrase.
- * Linearly searches for a match to the given line in O(N).
+ * Verifies link via DynamoDb and checks recieved at least 1 replacement keyword/phrase.
+ * Replaces keywords in Sheet in O(N), in DB O(1)
  * 
- * Once a match is found, the user is asked to verify that they want to 
+ * The user is asked to verify that they want to 
  * overwrite the given keywords. This utilizes the react functionality of 
  * Discord to gather the yes or no via thumbs up or down emotes.
  * 
@@ -153,8 +153,9 @@ async function overwriteSheet(newKeywords, twitchID) {
     var rows = await sheet.getRows();
 
     // Look for the given link in O(N)
+    // Searches in reverse order since overwrite is likely to be used most often to correct mistakes in clips just added.
     var i;
-    for (i = 0; i < rows.length; i++) {
+    for (i = (rows.length - 1); i >= 0; i--) {
         if (rows[i].Clip.includes(twitchID)) {
             // Replace keywords in the appropriate row
             rows[i].Keywords = newKeywords.join();
@@ -165,7 +166,7 @@ async function overwriteSheet(newKeywords, twitchID) {
         }
     }
     // If didn't find the clip in the sheet, throw error.
-    if (i == rows.length) {
+    if (i < 0) {
         throw "Overwrite unsuccessful. Unable to find clip in Sheet. Likely clip in DB but not sheet.";
     }
 }

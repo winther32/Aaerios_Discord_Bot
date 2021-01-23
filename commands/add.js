@@ -1,7 +1,7 @@
 /*
  * Function to add a new clip to the sheet.
  * 
- * Verifies link, checks for duplicates (O(N)). Writes new row if no duplicates
+ * Verifies link, checks for duplicates O(1). Writes new row if no duplicates
  * Row includes: Keywords, User who added, date added, link to clip
 */
 
