@@ -135,7 +135,7 @@ module.exports = {
     description: 'sync google sheet and dynamoDB entries',
     execute(message, args) {
         // Only allow specific users to call this function (by unique Discord ID). Here it's just me.
-        if (message.author.id === "194935918438776832") {
+        if (message.author.id === process.env.DISCORD_AUTH_USER_ID) {
             console.log("Attempting sync operation.");
             (async() => {
                 await sheet2db();
