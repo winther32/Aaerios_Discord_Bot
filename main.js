@@ -15,14 +15,15 @@
  * Built by Mac Lyle a.k.a Winther32
 */
 
+// init env variables
+const dotenv = require('dotenv');
+dotenv.config();
 
 // Init discord sdk
 // const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-// Google Sheet info for clip library
-const sheet = require('./secrets/sheetID');
 
 // Prefix for the bot command to be triggered
 const prefix = '$';
@@ -89,7 +90,7 @@ client.on('message', message => {
         // Library Commands
         case 'library':
         case 'lib':
-            message.channel.send(sheet.link);
+            message.channel.send(process.env.GCP_SHEET_LINK);
             break;
         case 'add':
             client.commands.get('add').execute(message, args, username);
@@ -146,5 +147,5 @@ client.on('message', message => {
     }
 });
 
-const access = require("./secrets/discordToken");
-client.login(access.token)
+// Login the bot via Bot token
+client.login(process.env.DISCORD_TOKEN);

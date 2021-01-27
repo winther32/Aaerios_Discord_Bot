@@ -11,21 +11,23 @@
 */
 
 
+// init env variables
+const dotenv = require('dotenv');
+dotenv.config();
+
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 var creds = require('../secrets/client_secret.json'); // Sheet manager creds
-var sheetInfo = require('../secrets/sheetID'); // Lib sheet ID
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
-const doc = new GoogleSpreadsheet(sheetInfo.ID);
+const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
 
 // init AWS DynamoDB access and doc client
-const awsCreds = require('../secrets/awsEnv'); // AWS env values
 const AWS = require('aws-sdk');
 AWS.config.update({
-    region: awsCreds.AWS_REGION,
-    accessKeyId: awsCreds.AWS_KEY_ID,
-    secretAccessKey: awsCreds.AWS_SECRET_KEY
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_KEY
 })
 const docClient = new AWS.DynamoDB.DocumentClient();
 
