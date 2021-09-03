@@ -17,7 +17,7 @@ module.exports = {
             .setTitle("Clippy Bot Command List")
             .setDescription("Learn how to use the community managed clip library with `$help library`")
             .addFields(
-                {name: 'Clips:', value: "`mustard`, `tarkov`, `milk`, `salsa`, `yogurt`"},
+                {name: 'Clips:', value: "`mustard`, `tarkov`, `milk`, `salsa`, `yogurt`, `lockin`"},
                 {name: 'Images:', value: "`angry`, `unit`, `devil`, `nom`"},
                 {name: 'Library:', value: "`library`, `songs`, `overwrite`, `add`, `lookup`"},
             )

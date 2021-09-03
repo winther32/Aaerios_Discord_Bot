@@ -10,7 +10,7 @@
  * 
 */
 
-
+const linkService = require('../services/links');
 // init env variables
 const dotenv = require('dotenv');
 dotenv.config();
@@ -193,8 +193,7 @@ module.exports = {
             return;
         }
         // Verify link
-        if (last.includes('twitch.tv') && last.includes('clip') && 
-            (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
+        if (linkService.verifyLink(last)) {
             // Valid arguments. Make keywords all lowercase
             args = args.map( el => el.toLowerCase()); 
             newOverwrite(message, args, last);

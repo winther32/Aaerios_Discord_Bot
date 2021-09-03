@@ -5,7 +5,7 @@
  * Row includes: Keywords, User who added, date added, link to clip
 */
 
-
+const linkService = require('../services/links');
 // init env variables
 const dotenv = require('dotenv');
 dotenv.config();
@@ -32,12 +32,12 @@ function addLookupDB(message, keywords, username, link) {
     console.log("Begin add...querying lookup DB.");
     // Get unique id from twitch clip url
     const twitchID = link.split('/').pop().split('?')[0];
-    
+
     // Duplicate query params
     var qParams = {
         TableName: 'discord-clip-lookup',
         KeyConditionExpression: "id = :key",
-        ExpressionAttributeValues:{
+        ExpressionAttributeValues: {
             ":key": twitchID
         }
     }
@@ -53,9 +53,9 @@ function addLookupDB(message, keywords, username, link) {
             console.log("Query success");
             if (data.Count == 0) {
                 // Clip not in the DB. Run function to add it to DB
-                addToSheet(message, keywords, username, link, twitchID).then( () => {
+                addToSheet(message, keywords, username, link, twitchID).then(() => {
                     enterData(message, keywords, username, link, twitchID)
-                }).catch( err => {
+                }).catch(err => {
                     // Failure in sheet add. DB call not executed then.
                     message.channel.send("Something went wrong! Unable to add clip.");
                     console.warn("Add failure in sheet DB not executed. Key:" + twitchID + err);
@@ -103,11 +103,11 @@ function enterData(message, keywords, username, link, twitchID) {
             // Success log
             console.log("DB add success:" + twitchID);
             // Send completion message. Here since this executes after sheet.
-            console.log("Add complete. Key: " + twitchID); 
+            console.log("Add complete. Key: " + twitchID);
             message.channel.send("Clip successfully added!");
         }
     }));
-}   
+}
 
 
 // Function to use google API and access sheet
@@ -124,18 +124,18 @@ async function addToSheet(message, keywords, username, link, twitchID) {
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
-    today = mm + '/' + dd + '/' + yyyy; 
+    today = mm + '/' + dd + '/' + yyyy;
 
     // Create array which will be pushed into next row available
     const rowArray = [keywords.join()];
     rowArray.push(username);
     rowArray.push(today);
-    rowArray.push(link); 
+    rowArray.push(link);
 
     // Write array into next available row
     const newRow = await sheet.addRow(rowArray);
     console.log('Sheet add successfull: ' + twitchID);
-   
+
 }
 
 
@@ -147,7 +147,7 @@ module.exports = {
         // Check for empty args
         if (args.length == 0) {
             message.channel.send('Invalid format!\n**Usage:** `$add <comma seperated keywords/phrases>, <link>`\n' +
-                                "**Example:** `$add we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+                "**Example:** `$add we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
             return;
         }
         // Know now that there is at least one element in the array
@@ -155,12 +155,11 @@ module.exports = {
         // Assert have at least one keyword.
         if (args.length == 0) {
             message.channel.send("At least one unique keyword/phrase to identify the clip followed by a comma and a link to a twitch clip is required.\n" +
-                                "**Example:** `$add we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+                "**Example:** `$add we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
             return;
         }
         // Verify that clip is valid link and from twitch
-        if (last.includes('twitch.tv') && last.includes('clip') && 
-            (last.startsWith('https://') || last.startsWith('www.') || last.startsWith('twitch.tv'))) {
+        if (linkService.verifyLink(last)) {
             // args have been validated, now only keywords. Make all keywords lowercase.
             args = args.map(el => el.toLowerCase());
             message.channel.send("Attempting to add clip...");

@@ -14,20 +14,21 @@
 
 // Performance API
 // const { PerformanceObserver, performance } = require('perf_hooks');
+const dotenv = require('dotenv');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+var creds = require('../secrets//client_secret.json'); // Sheet manager creds
+const AWS = require('aws-sdk');
+const linkService = require('../services/links');
 
 // init env variables
-const dotenv = require('dotenv');
 dotenv.config();
 
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-var creds = require('../secrets//client_secret.json'); // Sheet manager creds
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
 
 // init AWS DynamoDB access and doc client
-const AWS = require('aws-sdk');
 AWS.config.update({
     region: process.env.AWS_REGION,
     accessKeyId: process.env.AWS_KEY_ID,
@@ -35,6 +36,7 @@ AWS.config.update({
 })
 const docClient = new AWS.DynamoDB.DocumentClient();
 
+// Determine if the link provided exists in the database
 function lookupLink(message, link) {
     // Performance logging
     // var start = performance.now();
@@ -47,13 +49,13 @@ function lookupLink(message, link) {
     var qParams = {
         TableName: 'discord-clip-lookup',
         KeyConditionExpression: "id = :key",
-        ExpressionAttributeValues:{
+        ExpressionAttributeValues: {
             ":key": twitchID
         }
     }
 
-     // Query the DB to check for duplicates
-     docClient.query(qParams, (error, data) => {
+    // Query the DB to check for duplicates
+    docClient.query(qParams, (error, data) => {
         if (error) {
             // Failure to complete the query
             console.error("Error: Unable to query lookup table for lookup. " + error);
@@ -71,7 +73,7 @@ function lookupLink(message, link) {
             } else {
                 // Entry already in the lookup DB
                 message.channel.send('**Found the Clip!\nIt\'s keywords are: **' + data.Items[0].info.keywords);
-                
+
                 // Performance logging
                 // var stop = performance.now();
                 // console.log("Lookup call took " + (stop-start) +  " milliseconds.");
@@ -99,7 +101,7 @@ async function keywordSearch(message, args) {
         if (rows[i].Keywords.includes(args[0])) {
             var matches = 1; // Count keyword matches, already matched 1
             // Verify rest user keywords are present in clip keywords. Won't enter loop if only 1 user keyword
-            for (matches; matches<args.length; matches++) {
+            for (matches; matches < args.length; matches++) {
                 if (!rows[i].Keywords.includes(args[matches])) {
                     break;
                 }
@@ -117,12 +119,12 @@ async function keywordSearch(message, args) {
         message.channel.send("No clips found with the keyword(s): " + args);
     } else if (numberOfResults > 5) {
         message.channel.send(numberOfResults + " clips matched your search. Here are the first 5:\n")
-        for (var i=0; i<5; i++){
+        for (var i = 0; i < 5; i++) {
             message.channel.send(results[i]);
         }
         message.channel.send("For the rest of the matching clips try narrowing your search or use `$library` and search the full library.")
     } else {
-        for (var i=0; i<results.length; i++){
+        for (var i = 0; i < results.length; i++) {
             message.channel.send(results[i]);
         }
     }
@@ -136,7 +138,7 @@ module.exports = {
         // Check if args are empty
         if (args.length == 0) {
             message.channel.send('Invalid format\n**Usage:** `$lookup <link>` **OR** `$lookup <comma seperated keywords>`\n' +
-                                "**Example:** `$lookup www.TwitchClip.com` **OR** `$lookup 50, cry`");
+                "**Example:** `$lookup www.TwitchClip.com` **OR** `$lookup 50, cry`");
             return;
         }
         // Limiting large amounts of keywords in search.
@@ -147,16 +149,15 @@ module.exports = {
 
         var link = args[0]; // Check if first arg is a link. Determines lookup/find method
         // Verfiy link
-        if (link.includes('twitch.tv') && link.includes('clip') && 
-            (link.startsWith('https://') || link.startsWith('www.') || last.startsWith('twitch.tv'))) {
+        if (linkService.verifyLink(link)) {
             // placeholder for google addition api
             message.channel.send('Looking up clip in database...');
             // Launch function to lookup O(1)
-            lookupLink(message, link);   
+            lookupLink(message, link);
         } else { // first arg is not a link so must be a keyword
             message.channel.send("Looking for clips with keyword(s): " + args);
             // Start the find function
-            (async() => {
+            (async () => {
                 await keywordSearch(message, args);
             })();
         }

@@ -7,7 +7,7 @@
  * on Discord and create your own Google service account to manage the google sheet. 
  *
  * This bot helps to build and manage a community driven library of twitch clips via Google Sheets.
- * A link to SirSserios's library is below:
+ * A link to SirAaerios's library is below:
  * @see https://docs.google.com/spreadsheets/d/13NWMHvTFKaaeKlu2u7HOkPT84PT-5ARKpsnHAihU26E/edit?usp=sharing
  * 
  * This bot also has fun commands specifically tailored to the SirAaerios Discord server.
@@ -121,6 +121,9 @@ client.on('message', message => {
             break;
         case 'yogurt':
             message.channel.send("https://clips.twitch.tv/PrettyArtisticTapirPeoplesChamp");
+            break;
+        case 'lockin':
+            message.channel.send("https://clips.twitch.tv/ExpensiveAliveSardineVoteNay");
             break;
 
         // Image commands (Server specific)
