@@ -1,4 +1,7 @@
+// Services relating to the handling and manipulation of URLs.
+
 module.exports = {
+    // Verifiy that a given link is a link to a twitch clip 
     verifyLink(link) {
         // Ensure var passed in exists
         if (link == null) {
@@ -10,5 +13,10 @@ module.exports = {
         } else {
             return false;
         }
+    },
+
+    // Gets unique twitchID from a valid twitch clip URL
+    extractTwitchID(link) {
+        return link.split('/').pop().split('?')[0];
     }
 }

@@ -12,29 +12,20 @@
  * 
 */
 
-// Performance API
-// const { PerformanceObserver, performance } = require('perf_hooks');
-const dotenv = require('dotenv');
+// const { PerformanceObserver, performance } = require('perf_hooks'); // Performance API
+const linkUtil = require('../utils/links');
+require('dotenv').config(); // init env variables
+const strs = require('../strings/english');
+const creds = require('../secrets//client_secret.json'); // Sheet manager creds
+
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-var creds = require('../secrets//client_secret.json'); // Sheet manager creds
-const AWS = require('aws-sdk');
-const linkService = require('../services/links');
+const Dynamo = require('../services/dynamo');
 
-// init env variables
-dotenv.config();
-
+const dynamo = new Dynamo();
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
-
-// init AWS DynamoDB access and doc client
-AWS.config.update({
-    region: process.env.AWS_REGION,
-    accessKeyId: process.env.AWS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_KEY
-})
-const docClient = new AWS.DynamoDB.DocumentClient();
 
 // Determine if the link provided exists in the database
 function lookupLink(message, link) {
@@ -42,43 +33,21 @@ function lookupLink(message, link) {
     // var start = performance.now();
 
     // Get unique twitchID from link
-    const twitchID = link.split('/').pop().split('?')[0];
-    console.log("Querying lookup DB... Key: " + twitchID);
+    const twitchID = linkUtil.extractTwitchID(link);
 
-    // Duplicate query params
-    var qParams = {
-        TableName: 'discord-clip-lookup',
-        KeyConditionExpression: "id = :key",
-        ExpressionAttributeValues: {
-            ":key": twitchID
-        }
-    }
-
-    // Query the DB to check for duplicates
-    docClient.query(qParams, (error, data) => {
+    // Call dynamo service
+    dynamo.get(twitchID, (error, keywords) => {
         if (error) {
-            // Failure to complete the query
-            console.error("Error: Unable to query lookup table for lookup. " + error);
-            message.channel.send("Something went wrong! Unable to find clip.");
+            message.channel.send(strs.dyno_get_error);
+        } else if (keywords) {
+            message.channel.send(strs.dyno_get_found + keywords);
         } else {
-            // Successful query
-            console.log("Query success. Key:" + twitchID);
-            if (data.Count == 0) {
-                // Clip not in DB
-                message.channel.send("This clip is not yet in the database! Feel free to add it with the `$add` command.");
-
-                // Performance logging
-                // var stop = performance.now();
-                // console.log("Lookup call took " + (stop-start) +  " milliseconds.");
-            } else {
-                // Entry already in the lookup DB
-                message.channel.send('**Found the Clip!\nIt\'s keywords are: **' + data.Items[0].info.keywords);
-
-                // Performance logging
-                // var stop = performance.now();
-                // console.log("Lookup call took " + (stop-start) +  " milliseconds.");
-            }
+            message.channel.send(strs.dyno_get_null);
         }
+
+        // Performance logging
+        // var stop = performance.now();
+        // console.log("Lookup call took " + (stop-start) +  " milliseconds.");
     });
 }
 
@@ -149,7 +118,7 @@ module.exports = {
 
         var link = args[0]; // Check if first arg is a link. Determines lookup/find method
         // Verfiy link
-        if (linkService.verifyLink(link)) {
+        if (linkUtil.verifyLink(link)) {
             // placeholder for google addition api
             message.channel.send('Looking up clip in database...');
             // Launch function to lookup O(1)

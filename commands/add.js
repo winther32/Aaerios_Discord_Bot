@@ -5,139 +5,51 @@
  * Row includes: Keywords, User who added, date added, link to clip
 */
 
-const linkService = require('../services/links');
-// init env variables
-const dotenv = require('dotenv');
-dotenv.config();
+const linkUtil = require('../utils/links');
+const strs = require('../strings/english');
+require('dotenv').config(); // init env variables
 
-// init Google sheet access via wrapper 
-// @see https://theoephraim.github.io/node-google-spreadsheet/#/
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const creds = require('../secrets/client_secret.json'); // Sheet manager creds
-// Create a document object using the ID of the spreadsheet - obtained from its URL.
-const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
+const Dynamo = require('../services/dynamo');
+const GcpService = require('../services/gcpSheets');
 
-// init AWS DynamoDB access and doc client
-const AWS = require('aws-sdk');
-AWS.config.update({
-    region: process.env.AWS_REGION,
-    accessKeyId: process.env.AWS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_KEY
-})
-const docClient = new AWS.DynamoDB.DocumentClient();
-
+const dynamo = new Dynamo();
+const gcpService = new GcpService();
 
 // Adding the entry into a DynamoDB for lookup. Key by twitchID 
 function addLookupDB(message, keywords, username, link) {
     console.log("Begin add...querying lookup DB.");
     // Get unique id from twitch clip url
-    const twitchID = link.split('/').pop().split('?')[0];
+    const twitchID = linkUtil.extractTwitchID(link);
 
-    // Duplicate query params
-    var qParams = {
-        TableName: 'discord-clip-lookup',
-        KeyConditionExpression: "id = :key",
-        ExpressionAttributeValues: {
-            ":key": twitchID
-        }
-    }
-
-    // Query the DB to check for duplicates
-    docClient.query(qParams, (error, data) => {
+    // Verify clip not already in DB, if so run func to add.
+    dynamo.get(twitchID, (error, response) => {
         if (error) {
-            // Failure to complete the query
-            console.error("Error: Unable to query lookup table for add. " + error);
-            message.channel.send("Something went wrong! Unable to add clip.");
+            message.channel.send(strs.dyno_get_error);
+        } else if (response) {
+            message.channel.send(strs.dyno_get_found);
         } else {
-            // Successful query
-            console.log("Query success");
-            if (data.Count == 0) {
-                // Clip not in the DB. Run function to add it to DB
-                addToSheet(message, keywords, username, link, twitchID).then(() => {
-                    enterData(message, keywords, username, link, twitchID)
-                }).catch(err => {
-                    // Failure in sheet add. DB call not executed then.
-                    message.channel.send("Something went wrong! Unable to add clip.");
-                    console.warn("Add failure in sheet DB not executed. Key:" + twitchID + err);
-                });
-            } else {
-                // Entry already in the lookup DB
-                console.log("Clip already in DB.");
-                message.channel.send('**This clip is already in the database!\n It\'s keywords are: **' + data.Items[0].info.keywords);
-            }
+            // Clip not in the DB. Run function to add it to DB
+            gcpService.addToSheet(keywords, username, link, twitchID).then(() => {
+                enterData(message, keywords, username, link, twitchID)
+            }).catch(err => {
+                // Failure in sheet add. DB call not executed then.
+                message.channel.send(strs.dyno_add_error);
+                console.warn("Add failure in sheet DB not executed. Key:" + twitchID + err);
+            });
+        }
+    })
+}
+
+// Function to enter entry data into the dynamo DB and send confirmation messages to server
+function enterData(message, keywords, username, link, twitchID) {
+    dynamo.put(keywords, username, link, twitchID, (error) => {
+        if (error) {
+            message.channel.send(strs.dyno_add_error);
+        } else {
+            message.channel.send(strs.dyno_add_success);
         }
     });
 }
-
-
-// Function to enter entry data into the DB
-function enterData(message, keywords, username, link, twitchID) {
-    console.log("Attempting to add entry to lookup DB.");
-    // Object to hold all the data as a value
-    let data = {};
-    // Build the info object
-    data.link = link;
-    data.author = username;
-    data.date = Date.now(); // Date as number (unix time)
-    data.keywords = keywords;
-
-    // Set up the params for Dynamo to save to table
-    const params = {
-        TableName: 'discord-clip-lookup',
-        Item: {
-            // unique key for table
-            id: twitchID,
-            // where the data is stored (value)
-            info: data
-        }
-    }
-
-    // Actually put value into table
-    docClient.put(params, (error => {
-        if (error) {
-            // Failure log. Throw error.
-            console.error("Unable to add to DB." + error);
-            message.channel.send("Something went wrong! Unable to add clip.");
-            // TODO error correction starts here. Clip in Sheet but not in DB.
-        } else {
-            // Success log
-            console.log("DB add success:" + twitchID);
-            // Send completion message. Here since this executes after sheet.
-            console.log("Add complete. Key: " + twitchID);
-            message.channel.send("Clip successfully added!");
-        }
-    }));
-}
-
-
-// Function to use google API and access sheet
-async function addToSheet(message, keywords, username, link, twitchID) {
-    // Authenticate with the Google Spreadsheets API.
-    await doc.useServiceAccountAuth(creds);
-    await doc.loadInfo();
-
-    // Get the sheet in spreadsheet
-    const sheet = doc.sheetsByIndex[0];
-
-    // Get today's date in a human readable string
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
-    today = mm + '/' + dd + '/' + yyyy;
-
-    // Create array which will be pushed into next row available
-    const rowArray = [keywords.join()];
-    rowArray.push(username);
-    rowArray.push(today);
-    rowArray.push(link);
-
-    // Write array into next available row
-    const newRow = await sheet.addRow(rowArray);
-    console.log('Sheet add successfull: ' + twitchID);
-
-}
-
 
 module.exports = {
     name: 'add',
@@ -146,27 +58,25 @@ module.exports = {
         // Verify got correct input for funcion i.e. at least one keyword and a link
         // Check for empty args
         if (args.length == 0) {
-            message.channel.send('Invalid format!\n**Usage:** `$add <comma seperated keywords/phrases>, <link>`\n' +
-                "**Example:** `$add we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+            message.channel.send(strs.cmd_add_usage + strs.cmd_add_example);
             return;
         }
         // Know now that there is at least one element in the array
         const last = args.pop(); //Get the last argument of the command. Should be clip link
         // Assert have at least one keyword.
         if (args.length == 0) {
-            message.channel.send("At least one unique keyword/phrase to identify the clip followed by a comma and a link to a twitch clip is required.\n" +
-                "**Example:** `$add we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+            message.channel.send( + strs.cmd_add_keyword_required + strs.cmd_add_example);
             return;
         }
         // Verify that clip is valid link and from twitch
-        if (linkService.verifyLink(last)) {
+        if (linkUtil.verifyLink(last)) {
             // args have been validated, now only keywords. Make all keywords lowercase.
             args = args.map(el => el.toLowerCase());
-            message.channel.send("Attempting to add clip...");
+            message.channel.send(strs.cmd_add_starting);
             // Launch function to add to DB and Sheet
             addLookupDB(message, args, username, last);
         } else {
-            message.channel.send("Invalid twitch clip link!");
+            message.channel.send(strs.link_invalid);
         }
     }
 }

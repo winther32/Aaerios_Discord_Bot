@@ -10,27 +10,27 @@
  * 
 */
 
-const linkService = require('../services/links');
-// init env variables
+const linkService = require('../utils/links');
+const AWS = require('aws-sdk');
 const dotenv = require('dotenv');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+const creds = require('../secrets/client_secret.json'); // Sheet manager creds
+
+// init env variables
 dotenv.config();
 
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-var creds = require('../secrets/client_secret.json'); // Sheet manager creds
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
 
 // init AWS DynamoDB access and doc client
-const AWS = require('aws-sdk');
 AWS.config.update({
     region: process.env.AWS_REGION,
     accessKeyId: process.env.AWS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_KEY
 })
 const docClient = new AWS.DynamoDB.DocumentClient();
-
 
 // Top level overwrite function call. Begins process of query for match, verify, call Sheet and Dynamo APIs.
 function newOverwrite(message, newKeywords, link) {

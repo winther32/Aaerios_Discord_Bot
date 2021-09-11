@@ -15,18 +15,28 @@
  * Built by Mac Lyle a.k.a Winther32
 */
 
-// init env variables
-const dotenv = require('dotenv');
-dotenv.config();
+
+require('dotenv').config(); // init env variables
+const strs = require('./strings/english');
 
 // Init discord sdk
-// const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+const argv = require('yargs/yargs')(process.argv.slice(2))
+    .usage('Usage: $0 <command> [options]')
+    .command("--dev", "run in dev test mode")
+    .help()
+    .argv;
+
+if (argv.dev) {
+    console.log("Dev Mode activated");
+    process.env.DEV_MODE = true;
+}
+const dev = process.env.DEV_MODE;
 
 // Prefix for the bot command to be triggered
-const prefix = '$';
+const prefix = (dev ? '#' : '$');
 const prefix1 = 'c!';
 const fs = require('fs');
 client.commands = new Discord.Collection();
@@ -40,26 +50,26 @@ for (const file of commandFiles) {
 
 // Log that the Bot is online
 client.once('ready', () => {
-    console.log('Clippy Bot is online!')
+    console.log(dev ? strs.bot_online_testing : strs.bot_online);
 });
 
 // Trigger for on message events.
 client.on('message', message => {
     // Check if prefix called or message is sent by a bot. (validation of bot call)
-    if((!message.content.toLowerCase().startsWith(prefix) && !message.content.toLowerCase().startsWith(prefix1)) || message.author.bot) return;
-    
+    if ((!message.content.toLowerCase().startsWith(prefix) && !message.content.toLowerCase().startsWith(prefix1)) || message.author.bot) return;
+
     // Remove prefix
-    var args; 
+    var args;
     if (message.content.toLowerCase().startsWith(prefix)) {
         args = message.content.slice(prefix.length);
     } else {
         args = message.content.slice(prefix1.length);
     }
-    
+
     // Split command from args
     const command = args.split(/ +/).shift().toLowerCase();
     // Create args array based on comma seperations
-    args = args.slice(command.length+1).split(/ *,+ */);
+    args = args.slice(command.length + 1).split(/ *,+ */);
 
     // Clean user input.
     // Filter out potential holes in args array
@@ -76,7 +86,7 @@ client.on('message', message => {
     // Log parsed call info
     console.log("Sender:" + username + ", Command:" + command + ", Args:" + args);
 
-    
+
     switch (command) {
         // Help commands
         case 'help':
@@ -128,16 +138,16 @@ client.on('message', message => {
 
         // Image commands (Server specific)
         case 'angry':
-            message.channel.send('Aaerios ANGRY!', {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785628010665345044/Aaerios_Angry.png"]});
+            message.channel.send('Aaerios ANGRY!', { files: ["https://cdn.discordapp.com/attachments/758413393076944916/785628010665345044/Aaerios_Angry.png"] });
             break;
         case 'unit':
-            message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", {files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627801332088852/swol_aaerios.jpg"]});
+            message.channel.send("Aaerios is BUILT DIFFERENT. He's a UNIT!", { files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627801332088852/swol_aaerios.jpg"] });
             break;
         case 'devil':
-            message.channel.send({files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627918972878868/devil_aaerios.png"]});
+            message.channel.send({ files: ["https://cdn.discordapp.com/attachments/758413393076944916/785627918972878868/devil_aaerios.png"] });
             break;
         case 'nom':
-            message.channel.send({files: ["https://cdn.discordapp.com/attachments/708925850690650166/796615093629747220/qlufpuswmn921.png"]});
+            message.channel.send({ files: ["https://cdn.discordapp.com/attachments/708925850690650166/796615093629747220/qlufpuswmn921.png"] });
             break;
 
         // Misc. commands (Server specific)
@@ -151,4 +161,8 @@ client.on('message', message => {
 });
 
 // Login the bot via Bot token
-client.login(process.env.DISCORD_TOKEN);
+var token = process.env.DISCORD_TOKEN;
+if (process.env.DEV_MODE) {
+    token = process.env.TESTING_TOKEN;
+}
+client.login(token);
