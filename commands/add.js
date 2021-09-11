@@ -7,7 +7,6 @@
 
 const linkUtil = require('../utils/links');
 const strs = require('../strings/english');
-require('dotenv').config(); // init env variables
 
 const Dynamo = require('../services/dynamo');
 const GcpService = require('../services/gcpSheets');
@@ -26,7 +25,7 @@ function addLookupDB(message, keywords, username, link) {
         if (error) {
             message.channel.send(strs.dyno_get_error);
         } else if (response) {
-            message.channel.send(strs.dyno_get_found);
+            message.channel.send(strs.dyno_get_found + response);
         } else {
             // Clip not in the DB. Run function to add it to DB
             gcpService.addToSheet(keywords, username, link, twitchID).then(() => {

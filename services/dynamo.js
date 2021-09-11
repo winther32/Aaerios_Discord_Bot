@@ -51,7 +51,7 @@ class DynamoService {
         });
     };
 
-    // Builds clip object and then attempts to put into Dynamo. Returns error or null (success)
+    // Builds clip object and then attempts to put into Dynamo. Callback returns error or null (success)
     put(keywords, username, link, twitchID, callback) {
         // Catch for dev testing so don't modify db or sheet in testing.
         if (process.env.DEV_MODE) {
@@ -98,6 +98,48 @@ class DynamoService {
                 callback(error);
             }
         }));
+    };
+
+    // Builds update params and calls update on dynamo. Callback returns error or null (success)
+    update(newKeywords, twitchID, callback) {
+        // Catch for dev testing so don't modify db or sheet in testing.
+        if (process.env.DEV_MODE) {
+            // Dummy response for dev
+            console.log("Ping update to Dynamo Service Layer");
+            // Throw the callback response up with success (ie no error)
+            if (typeof callback == "function") {
+                callback();
+            }
+            return;
+        }
+
+        // Update params
+        var params = {
+            TableName: 'discord-clip-lookup',
+            Key: { 'id': twitchID },
+            UpdateExpression: "set #i.#k = :nK",
+            ExpressionAttributeNames: {
+                "#i": "info",
+                "#k": "keywords"
+            },
+            ExpressionAttributeValues: {
+                ':nK': newKeywords.join()
+            }
+        }
+
+        docClient.update(params, (error) => {
+            if (error) {
+                // Overwrite in Dynamo failure
+                console.error("Unable to overwrite DB. Key:" + twitchID + "Err: " + error);
+            } else {
+                // Overwrite of DB is a success
+                console.log("DB ovewrite successful " + twitchID);
+            }
+            // Throw the callback response up with success (ie no error)
+            if (typeof callback == "function") {
+                callback(error);
+            }
+        });
     }
 }
 

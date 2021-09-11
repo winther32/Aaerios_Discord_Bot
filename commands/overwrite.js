@@ -10,62 +10,32 @@
  * 
 */
 
-const linkService = require('../utils/links');
-const AWS = require('aws-sdk');
-const dotenv = require('dotenv');
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const creds = require('../secrets/client_secret.json'); // Sheet manager creds
+const linkUtil = require('../utils/links');
+const strs = require('../strings/english');
 
-// init env variables
-dotenv.config();
+const Dynamo = require('../services/dynamo');
+const GcpService = require('../services/gcpSheets');
 
-// init Google sheet access via wrapper 
-// @see https://theoephraim.github.io/node-google-spreadsheet/#/
-// Create a document object using the ID of the spreadsheet - obtained from its URL.
-const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
+const dynamo = new Dynamo();
+const gcpService = new GcpService();
 
-// init AWS DynamoDB access and doc client
-AWS.config.update({
-    region: process.env.AWS_REGION,
-    accessKeyId: process.env.AWS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_KEY
-})
-const docClient = new AWS.DynamoDB.DocumentClient();
+
 
 // Top level overwrite function call. Begins process of query for match, verify, call Sheet and Dynamo APIs.
 function newOverwrite(message, newKeywords, link) {
     // Get unique id from twitch clip url
     const twitchID = link.split('/').pop().split('?')[0];
     console.log("Begin overwrite...querying lookup DB. Key:" + twitchID);
-        
-    // Duplicate query params
-    var qParams = {
-        TableName: 'discord-clip-lookup',
-        KeyConditionExpression: "id = :key",
-        ExpressionAttributeValues:{
-            ":key": twitchID
-        }
-    }
 
-    // Query the DB to check for duplicates
-    docClient.query(qParams, (error, data) => {
+    dynamo.get(twitchID, (error, response) => {
         if (error) {
-            // Failure to complete the query
-            console.error("Error: Unable to query lookup table for overwrite. " + error);
             message.channel.send("Uh oh ... Something went wrong! Overwrite cancelled.");
+        } else if (response) {
+            // Found Clip in DB. 
+            verify(message, response, newKeywords, twitchID);
         } else {
-            // Successful query
-            console.log("Query success. Key:" + twitchID);
-            if (data.Count == 0) {
-                // Clip not in the DB. Nothing to overwrite.
-                // Log and message clip not in DB
-                message.channel.send("Clip not yet in database, use the `$add` command to add it!");
-                console.log("Clip not in Dynamo. Key:" + twitchID);
-            } else {
-                // Found Clip in DB. 
-                // Call verification method to verify action with user and then call overwrite functions
-                verify(message, data.Items[0].info.keywords, newKeywords, twitchID);
-            }
+            // Clip not in the DB. Nothing to overwrite.
+            message.channel.send("Clip not yet in database, use the `$add` command to add it!");
         }
     });
 }
@@ -89,7 +59,7 @@ function verify(message, oldKeywords, newKeywords, twitchID) {
                 // Confirmed to overwrite
                 console.log("Attempting to overwrite keywords. Key: " + twitchID);
                  // Launch function to overwrite keywords in the Sheet. On completion try overwrite to DB.
-                overwriteSheet(newKeywords, twitchID).then( () => { 
+                gcpService.overwriteSheet(newKeywords, twitchID).then(() => { 
                     // OverwriteDB func
                     overwriteDB(message, newKeywords, twitchID)
                 }).catch(err => {
@@ -114,63 +84,14 @@ function verify(message, oldKeywords, newKeywords, twitchID) {
 
 // Overwrite the keywords in the lookup DB with new keywords. O(1)
 function overwriteDB(message, newKeywords, twitchID) {
-    // Update params
-    var params = {
-        TableName:  'discord-clip-lookup',
-        Key: { 'id': twitchID},
-        UpdateExpression: "set #i.#k = :nK",
-        ExpressionAttributeNames: {
-            "#i": "info",
-            "#k": "keywords" 
-        },
-        ExpressionAttributeValues:{
-            ':nK': newKeywords.join()
-        }
-    }
-
-    docClient.update(params, (error) => {
+    // Call service to update dynamo
+    dynamo.update(newKeywords, twitchID, (error) => {
         if (error) {
-            // Overwrite in Dynamo failure
-            console.error("Unable to overwrite DB. Key:" + twitchID + "Err: " + error);
             message.channel.send("Something went wrong! Unable to update clip."); 
-            // TODO error correction triggered here. In sheet but not DB.
         } else {
-            // Overwrite of DB is a success
-            console.log("DB ovewrite successful " + twitchID);
-            // Log end of overwrite since called after sheet overwrite
-            console.log("Overwrite finished. Key: " + twitchID);
             message.channel.send('Overwrite complete!');
         }
-    })
-}
-
-
-// Overwrite keywords in Sheet in O(n)
-async function overwriteSheet(newKeywords, twitchID) {
-    // Authenticate with the Google Spreadsheets API.
-    await doc.useServiceAccountAuth(creds);
-    await doc.loadInfo();
-    // Get the sheet in spreadsheet
-    const sheet = doc.sheetsByIndex[0];
-    var rows = await sheet.getRows();
-
-    // Look for the given link in O(N)
-    // Searches in reverse order since overwrite is likely to be used most often to correct mistakes in clips just added.
-    var i;
-    for (i = (rows.length - 1); i >= 0; i--) {
-        if (rows[i].Clip.includes(twitchID)) {
-            // Replace keywords in the appropriate row
-            rows[i].Keywords = newKeywords.join();
-            rows[i].save();
-            // Log completion of sheet overwrite
-            console.log("Sheet overwrite successful for: " + twitchID);
-            break;
-        }
-    }
-    // If didn't find the clip in the sheet, throw error.
-    if (i < 0) {
-        throw "Overwrite unsuccessful. Unable to find clip in Sheet. Likely clip in DB but not sheet.";
-    }
+    });
 }
 
 module.exports = {
@@ -193,7 +114,7 @@ module.exports = {
             return;
         }
         // Verify link
-        if (linkService.verifyLink(last)) {
+        if (linkUtil.verifyLink(last)) {
             // Valid arguments. Make keywords all lowercase
             args = args.map( el => el.toLowerCase()); 
             newOverwrite(message, args, last);
