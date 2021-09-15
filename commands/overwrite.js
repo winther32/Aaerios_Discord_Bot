@@ -64,7 +64,7 @@ function verify(message, oldKeywords, newKeywords, twitchID) {
                     overwriteDB(message, newKeywords, twitchID)
                 }).catch(err => {
                     // Failure of the sheet overwrite call
-                    message.channel.send("Something went wrong! Unable to update clip."); 
+                    message.channel.send(strs.dyno_update_error); 
                     console.warn("Overwrite failure in sheet DB not executed. Key:" + twitchID + "Error:" + err);           
                 });
             } else {
