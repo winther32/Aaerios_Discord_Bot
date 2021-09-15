@@ -36,7 +36,7 @@ if (argv.dev) {
 const dev = process.env.DEV_MODE;
 
 // Prefix for the bot command to be triggered
-const prefix = (dev ? '#' : '$');
+const prefix = (dev ? '#' : '$'); // when in testing mode use different prefix to test dev build
 const prefix1 = 'c!';
 const fs = require('fs');
 client.commands = new Discord.Collection();
@@ -109,8 +109,10 @@ client.on('message', message => {
             client.commands.get('overwrite').execute(message, args);
             break;
         case 'lookup':
-        case 'search':
             client.commands.get('lookup').execute(message, args);
+            break;
+        case 'search':
+            client.commands.get('search').execute(message, args);
             break;
         case 'sync':
             client.commands.get('sync').execute(message, args);

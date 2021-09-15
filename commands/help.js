@@ -19,7 +19,7 @@ module.exports = {
             .addFields(
                 {name: 'Clips:', value: "`mustard`, `tarkov`, `milk`, `salsa`, `yogurt`, `lockin`"},
                 {name: 'Images:', value: "`angry`, `unit`, `devil`, `nom`"},
-                {name: 'Library:', value: "`library`, `songs`, `overwrite`, `add`, `lookup`"},
+                {name: 'Library:', value: "`library`, `songs`, `overwrite`, `add`, `lookup`, `search`"},
             )
             .setFooter("Created by Winther");
         

@@ -29,13 +29,13 @@ function newOverwrite(message, newKeywords, link) {
 
     dynamo.get(twitchID, (error, response) => {
         if (error) {
-            message.channel.send("Uh oh ... Something went wrong! Overwrite cancelled.");
+            message.channel.send(strs.dyno_get_error);
         } else if (response) {
             // Found Clip in DB. 
             verify(message, response, newKeywords, twitchID);
         } else {
             // Clip not in the DB. Nothing to overwrite.
-            message.channel.send("Clip not yet in database, use the `$add` command to add it!");
+            message.channel.send(strs.dyno_get_null);
         }
     });
 }
@@ -87,9 +87,9 @@ function overwriteDB(message, newKeywords, twitchID) {
     // Call service to update dynamo
     dynamo.update(newKeywords, twitchID, (error) => {
         if (error) {
-            message.channel.send("Something went wrong! Unable to update clip."); 
+            message.channel.send(strs.dyno_update_error); 
         } else {
-            message.channel.send('Overwrite complete!');
+            message.channel.send(strs.dyno_update_success);
         }
     });
 }
@@ -101,16 +101,14 @@ module.exports = {
          // Ensure getting new keywords and a link
          // Check for empty args
         if (args.length == 0) {
-            message.channel.send('Invalid format\n**Usage:** `$overwrite <comma seperated keywords/phrases>, <link>`\n' +
-                                "**Example:** `$overwrite we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+            message.channel.send(strs.cmd_overwrite_usage + strs.cmd_overwrite_example);
             return;
         }
         // Know have at least one arg
         const last = args.pop(); // link should be last arg given
         // Assert have at least one keyword.
         if (args.length == 0) {
-            message.channel.send("At least one unique keyword/phrase to identify the clip followed by a comma and a link to a twitch clip is required.\n" +
-                                "**Example:** `$overwrite we are tarkov, escape from tarkov, song, www.TwitchClip.com`");
+            message.channel.send(strs.cmd_overwrite_keyword_required + strs.cmd_overwrite_example);
             return;
         }
         // Verify link
@@ -119,7 +117,7 @@ module.exports = {
             args = args.map( el => el.toLowerCase()); 
             newOverwrite(message, args, last);
         } else {
-            message.channel.send("Invalid twitch clip link!");
+            message.channel.send(strs.link_invalid);
         }
     }
 }
