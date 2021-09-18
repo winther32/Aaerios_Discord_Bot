@@ -8,8 +8,6 @@
  * 
  */
 
-const linkUtil = require('../utils/links');
-require('dotenv').config(); // init env variables
 const strs = require('../strings/english');
 const creds = require('../secrets//client_secret.json'); // Sheet manager creds
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -70,10 +68,13 @@ module.exports = {
     name: 'search',
     description: 'keyword search of clips in sheet',
     execute(message, args) {
-        // Verify got correct args for this function. I.E. just a link or comma separated keywords (up to 5)
+        // Verify got correct args for this function. I.E. <=5 comma separated keywords
         // Check if args are empty
         if (args.length == 0) {
             message.channel.send(strs.cmd_search_usage + strs.cmd_search_example);
+            return;
+        } else if (args.length > 5) {
+            message.channel.send(strs.cmd_search_keyword_cap_error);
             return;
         } else {
             message.channel.send(strs.cmd_search_starting + args);

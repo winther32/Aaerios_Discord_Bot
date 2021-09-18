@@ -16,29 +16,19 @@
 */
 
 
-require('dotenv').config(); // init env variables
+require('dotenv').config(); // init env variables globally
 const strs = require('./strings/english');
-
-// Init discord sdk
+const { devFlag } = require('./utils/cli-flags');
 const Discord = require('discord.js');
-const client = new Discord.Client();
+const fs = require('fs');
 
-const argv = require('yargs/yargs')(process.argv.slice(2))
-    .usage('Usage: $0 <command> [options]')
-    .command("--dev", "run in dev test mode")
-    .help()
-    .argv;
-
-if (argv.dev) {
-    console.log("Dev Mode activated");
-    process.env.DEV_MODE = true;
-}
+const client = new Discord.Client(); // Init Discord Client
+devFlag(); // Check if dev flag passed in CLI
 const dev = process.env.DEV_MODE;
 
 // Prefix for the bot command to be triggered
 const prefix = (dev ? '#' : '$'); // when in testing mode use different prefix to test dev build
 const prefix1 = 'c!';
-const fs = require('fs');
 client.commands = new Discord.Collection();
 
 // Read in commands in commands dir
@@ -80,13 +70,13 @@ client.on('message', message => {
     for (var i = 0; i < args.length; i++) {
         args[i] = args[i].trim();
     }
-    // Expected args form: [this,is,an,example form of,args,www.LinkToSite.com]
+    // Expected cleaned args form: [this,is,an,example form of,args,www.LinkToSite.com]
 
     var username = message.author.username; // User who sent the command
     // Log parsed call info
     console.log("Sender:" + username + ", Command:" + command + ", Args:" + args);
 
-
+    
     switch (command) {
         // Help commands
         case 'help':

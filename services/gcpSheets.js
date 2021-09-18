@@ -1,6 +1,5 @@
 // Service layer for interacting with GCP sheet
 
-require('dotenv').config(); // init env variables
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const creds = require('../secrets/client_secret.json'); // Sheet manager creds
 

@@ -20,7 +20,6 @@ const dynamo = new Dynamo();
 const gcpService = new GcpService();
 
 
-
 // Top level overwrite function call. Begins process of query for match, verify, call Sheet and Dynamo APIs.
 function newOverwrite(message, newKeywords, link) {
     // Get unique id from twitch clip url
