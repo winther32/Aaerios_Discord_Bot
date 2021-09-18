@@ -9,59 +9,25 @@
  */
 
 const strs = require('../strings/english');
-const creds = require('../secrets//client_secret.json'); // Sheet manager creds
-const { GoogleSpreadsheet } = require('google-spreadsheet');
+const GcpService = require('../services/gcpSheets');
 
-// init Google sheet access via wrapper 
-// @see https://theoephraim.github.io/node-google-spreadsheet/#/
-// Create a document object using the ID of the spreadsheet - obtained from its URL.
-const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
+const gcpService = new GcpService();
 
-// Function to lookup and return a list of clips with given keywords
-// This is a basic search algorithm. O(N*M) N=rows in database, M=args given
-// Realistically, in practice expect to get much closer to O(N) time.
+// Call the keyword search in the GCP service and respond to user.
 async function keywordSearch(message, args) {
-    await doc.useServiceAccountAuth(creds);
-    await doc.loadInfo();
-
-    // Get the sheet in spreadsheet
-    const sheet = await doc.sheetsByIndex[0];
-    var rows = await sheet.getRows();
-    var results = [];
-    var numberOfResults = 0;
-    // Linear loop to find match if exists up to 5 matches returned
-    for (var i = 0; i < rows.length; i++) {
-        // If the first keyword matches, verify rest of keywords before adding
-        if (rows[i].Keywords.includes(args[0])) {
-            var matches = 1; // Count keyword matches, already matched 1
-            // Verify rest user keywords are present in clip keywords. Won't enter loop if only 1 user keyword
-            for (matches; matches < args.length; matches++) {
-                if (!rows[i].Keywords.includes(args[matches])) {
-                    break;
-                }
+    gcpService.searchSheet(args, (res) => {
+        if (res.totalMatches == 0) {
+            message.channel.send(strs.cmd_search_none_found + args);
+        } else {
+            message.channel.send(`**${res.totalMatches}** clips matched your search. ${res.totalMatches > 5 ? "Here are the first 5:" : ""}\n`);
+            for (const link of res.data) {
+                message.channel.send(link);
             }
-            // If all user keywords present, add clip to result and count it.
-            if (matches == args.length) {
-                results.push(rows[i].Clip);
-                numberOfResults++;
+            if (res.totalMatches > 5) {
+                message.channel.send(strs.cmd_search_result_overflow);
             }
         }
-    }
-
-    // Return the results of search
-    if (results.length == 0) {
-        message.channel.send("No clips found with the keyword(s): " + args);
-    } else if (numberOfResults > 5) {
-        message.channel.send(numberOfResults + " clips matched your search. Here are the first 5:\n")
-        for (var i = 0; i < 5; i++) {
-            message.channel.send(results[i]);
-        }
-        message.channel.send("For the rest of the matching clips try narrowing your search or use `$library` and search the full library.")
-    } else {
-        for (var i = 0; i < results.length; i++) {
-            message.channel.send(results[i]);
-        }
-    }
+    });
 }
 
 module.exports = {

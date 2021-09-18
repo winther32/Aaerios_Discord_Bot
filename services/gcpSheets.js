@@ -80,6 +80,50 @@ class GcpSheetService {
             throw "Overwrite unsuccessful. Unable to find clip in Sheet. Likely clip in DB but not sheet.";
         }
     }
+
+    // Function to lookup and return a list of clips with given keywords
+    // This is a basic search algorithm. O(N*M) N=rows in database, M=args given
+    // Realistically, in practice expect to get much closer to O(N) time.
+    async searchSheet(args, callback) {
+        await doc.useServiceAccountAuth(creds);
+        await doc.loadInfo();
+
+        // Get the sheet in spreadsheet
+        const sheet = await doc.sheetsByIndex[0];
+        var rows = await sheet.getRows();
+
+        // Keyword search function
+        var results = [];
+        var numberOfResults = 0;
+        // Linear loop to find match if exists up to 5 matches returned
+        for (let i = 0; i < rows.length; i++) {
+            let j = 0;
+            // Verify rest user keywords are present in clip keywords.
+            for (j; j < args.length; j++) {
+                if (!rows[i].Keywords.includes(args[j])) {
+                    break;
+                }
+            }
+            // If all user keywords present, add clip to result and count it.
+            if (j == args.length) {
+                // Only add to the results array if less than 5 stored.
+                if (results.length < 5) {
+                    results.push(rows[i].Clip);
+                }
+                numberOfResults++;
+            }
+        }
+
+        // Return the results of search in response obj
+        let response = {
+            data: results,
+            totalMatches: numberOfResults
+        }
+        // Throw the callback response up with success (ie no error)
+        if (typeof callback == "function") {
+            callback(response);
+        }
+    }
 }
 
 module.exports = GcpSheetService;
