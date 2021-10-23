@@ -10,9 +10,9 @@ const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
 
 // class wrapper for all service functions.
 class GcpSheetService {
+    
     // Function to use google API and access sheet
     async addToSheet(keywords, username, link, twitchID) {
-
         // Catch for dev testing so don't modify db or sheet in testing.
         if (process.env.DEV_MODE) {
             // Dummy response for dev
@@ -47,7 +47,6 @@ class GcpSheetService {
 
     // Overwrite keywords in Sheet in O(n)
     async overwriteSheet(newKeywords, twitchID) {
-
         // Catch for dev testing so don't modify db or sheet in testing.
         if (process.env.DEV_MODE) {
             // Dummy response for dev

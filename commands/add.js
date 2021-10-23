@@ -36,7 +36,7 @@ function addLookupDB(message, keywords, username, link) {
                 console.warn("Add failure in sheet DB not executed. Key:" + twitchID + err);
             });
         }
-    })
+    });
 }
 
 // Function to enter entry data into the dynamo DB and send confirmation messages to server

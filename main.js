@@ -24,7 +24,7 @@ const fs = require('fs');
 
 const client = new Discord.Client(); // Init Discord Client
 devFlag(); // Check if dev flag passed in CLI
-const dev = process.env.DEV_MODE;
+const dev = (process.env.DEV_MODE === "true"); // Get a bool out of the env
 
 // Prefix for the bot command to be triggered
 const prefix = (dev ? '#' : '$'); // when in testing mode use different prefix to test dev build
@@ -141,6 +141,10 @@ client.on('message', message => {
         case 'nom':
             message.channel.send({ files: ["https://cdn.discordapp.com/attachments/708925850690650166/796615093629747220/qlufpuswmn921.png"] });
             break;
+        case 'bean':
+        case 'beans':
+            client.commands.get("beans").execute(message);
+            break;
 
         // Misc. commands (Server specific)
         case 'songs':
@@ -154,7 +158,7 @@ client.on('message', message => {
 
 // Login the bot via Bot token
 var token = process.env.DISCORD_TOKEN;
-if (process.env.DEV_MODE) {
+if (dev) {
     token = process.env.TESTING_TOKEN;
 }
 client.login(token);
