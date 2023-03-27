@@ -1,7 +1,7 @@
 // Service layer for interacting with GCP sheet
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const creds = require('../secrets/client_secret.json'); // Sheet manager creds
+const creds = require('../../secrets/client_secret.json'); // Sheet manager creds
 
 /* init Google sheet access via wrapper 
  * @see https://theoephraim.github.io/node-google-spreadsheet/#/

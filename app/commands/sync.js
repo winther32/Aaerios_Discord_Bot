@@ -10,7 +10,7 @@ dotenv.config();
 // init Google sheet access via wrapper 
 // @see https://theoephraim.github.io/node-google-spreadsheet/#/
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const creds = require('../secrets/client_secret.json'); // Sheet manager creds
+const creds = require('../../secrets/client_secret.json'); // Sheet manager creds
 // Create a document object using the ID of the spreadsheet - obtained from its URL.
 const doc = new GoogleSpreadsheet(process.env.GCP_SHEET_ID);
 

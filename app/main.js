@@ -15,8 +15,7 @@
  * Built by Mac Lyle a.k.a Winther32
 */
 
-
-require('dotenv').config(); // init env variables globally
+require('dotenv').config({path:'../.env'}); // init env variables globally
 const strs = require('./strings/english');
 const { devFlag } = require('./utils/cli-flags');
 const Discord = require('discord.js');
@@ -32,7 +31,7 @@ const prefix1 = 'c!';
 client.commands = new Discord.Collection();
 
 // Read in commands in commands dir
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith(".js"));
+const commandFiles = fs.readdirSync('./app/commands').filter(file => file.endsWith(".js"));
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     client.commands.set(command.name, command);
