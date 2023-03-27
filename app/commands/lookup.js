@@ -45,11 +45,10 @@ module.exports = {
             message.channel.send(strs.cmd_lookup_usage + strs.cmd_lookup_example);
             return;
         }
-    
-        var link = args[0]; // Check if first arg is a link. Determines lookup/find method
+        
+        var link = args[0]; // First arg should be the link
         // Verfiy link
         if (linkUtil.verifyLink(link)) {
-            // placeholder for google addition api
             message.channel.send(strs.cmd_lookup_starting);
             // Launch function to lookup O(1)
             lookupLink(message, link);

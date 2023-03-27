@@ -20,13 +20,13 @@ const dynamo = new Dynamo();
 const gcpService = new GcpService();
 
 
-
 // Top level overwrite function call. Begins process of query for match, verify, call Sheet and Dynamo APIs.
 function newOverwrite(message, newKeywords, link) {
     // Get unique id from twitch clip url
-    const twitchID = link.split('/').pop().split('?')[0];
+    const twitchID = linkUtil.extractTwitchID(link);
     console.log("Begin overwrite...querying lookup DB. Key:" + twitchID);
 
+    // Verify clip in DB then launch user action verification
     dynamo.get(twitchID, (error, response) => {
         if (error) {
             message.channel.send(strs.dyno_get_error);
@@ -73,7 +73,7 @@ function verify(message, oldKeywords, newKeywords, twitchID) {
                 console.log('User cancelled overwrite' + twitchID);
             }
         })
-        .catch(collected => {
+        .catch(() => {
             // Catch for taking too long.
             message.reply('Action cancelled. Timed out.');
             console.log("Overwrite cancelled. Verification timed out. Key:" + twitchID);

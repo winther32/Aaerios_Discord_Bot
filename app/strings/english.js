@@ -34,6 +34,9 @@ module.exports = {
     cmd_search_starting: "Looking for clips with keyword(s): ",
     cmd_search_usage: "**Usage:** `$search <comma seperated keywords>`\n",
     cmd_search_example: "**Example:** `$lookup 50, cry`",
+    cmd_search_keyword_cap_error: "For now you may only use up to **5** keywords in your search.",
+    cmd_search_none_found: "No clips found with the keyword(s): ",
+    cmd_search_result_overflow: "For the rest of the matching clips try narrowing your search or use `$library` and search the full library.",
 
     // Overwrite Command:
     cmd_overwrite_starting: "",

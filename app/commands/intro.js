@@ -2,7 +2,6 @@
  * This function produces a formatted display of all commands that this bot uses.
 */
 
-const { DiscordAPIError, Channel } = require("discord.js");
 const Discord = require('discord.js');
 const Colors = require('../colors');
 
