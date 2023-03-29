@@ -34,5 +34,14 @@ module.exports = {
   // Gets unique twitchID from a valid twitch clip URL
   extractTwitchID(link) {
     return link.split('/').pop().split('?')[0];
-  }
+  },
+
+  /*********************** General ***********************/
+
+  // min max inclusive random int func
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
 }

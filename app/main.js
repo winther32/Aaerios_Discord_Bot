@@ -149,6 +149,8 @@ client.on('message', message => {
         case 'songs':
             message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
             break;
+        case 'bbquote':
+            client.commands.get("bbQuote").execute(message);
 
         default:
             break;
