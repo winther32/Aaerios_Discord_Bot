@@ -4,7 +4,7 @@
 */
 
 // const { PerformanceObserver, performance } = require('perf_hooks'); // Performance API
-const linkUtil = require('../utils/links');
+const Util = require('../util.js');
 const strs = require('../strings/english');
 const Dynamo = require('../services/dynamo');
 
@@ -17,7 +17,7 @@ function lookupLink(message, link) {
     // var start = performance.now();
 
     // Get unique twitchID from link
-    const twitchID = linkUtil.extractTwitchID(link);
+    const twitchID = Util.extractTwitchID(link);
 
     // Call dynamo service
     dynamo.get(twitchID, (error, keywords) => {
@@ -48,7 +48,7 @@ module.exports = {
         
         var link = args[0]; // First arg should be the link
         // Verfiy link
-        if (linkUtil.verifyLink(link)) {
+        if (Util.verifyLink(link)) {
             message.channel.send(strs.cmd_lookup_starting);
             // Launch function to lookup O(1)
             lookupLink(message, link);

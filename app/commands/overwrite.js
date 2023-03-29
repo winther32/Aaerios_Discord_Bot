@@ -10,7 +10,7 @@
  * 
 */
 
-const linkUtil = require('../utils/links');
+const Util = require('../util.js');
 const strs = require('../strings/english');
 
 const Dynamo = require('../services/dynamo');
@@ -23,7 +23,7 @@ const gcpService = new GcpService();
 // Top level overwrite function call. Begins process of query for match, verify, call Sheet and Dynamo APIs.
 function newOverwrite(message, newKeywords, link) {
     // Get unique id from twitch clip url
-    const twitchID = linkUtil.extractTwitchID(link);
+    const twitchID = Util.extractTwitchID(link);
     console.log("Begin overwrite...querying lookup DB. Key:" + twitchID);
 
     // Verify clip in DB then launch user action verification

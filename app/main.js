@@ -17,12 +17,12 @@
 
 require('dotenv').config({path:'../.env'}); // init env variables globally
 const strs = require('./strings/english');
-const { devFlag } = require('./utils/cli-flags');
+const Util = require('./util.js');
 const Discord = require('discord.js');
 const fs = require('fs');
 
 const client = new Discord.Client(); // Init Discord Client
-devFlag(); // Check if dev flag passed in CLI
+Util.devFlag(); // Check if dev flag passed in CLI
 const dev = (process.env.DEV_MODE === "true"); // Get a bool out of the env
 
 // Prefix for the bot command to be triggered

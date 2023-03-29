@@ -5,7 +5,7 @@
  * Row includes: Keywords, User who added, date added, link to clip
 */
 
-const linkUtil = require('../utils/links');
+const Util = require('../util.js');
 const strs = require('../strings/english');
 
 const Dynamo = require('../services/dynamo');
@@ -18,7 +18,7 @@ const gcpService = new GcpService();
 function addLookupDB(message, keywords, username, link) {
     console.log("Begin add...querying lookup DB.");
     // Get unique id from twitch clip url
-    const twitchID = linkUtil.extractTwitchID(link);
+    const twitchID = Util.extractTwitchID(link);
 
     // Verify clip not already in DB, if so run func to add.
     dynamo.get(twitchID, (error, response) => {
@@ -68,7 +68,7 @@ module.exports = {
             return;
         }
         // Verify that clip is valid link and from twitch
-        if (linkUtil.verifyLink(last)) {
+        if (Util.verifyLink(last)) {
             // args have been validated, now only keywords. Make all keywords lowercase.
             args = args.map(el => el.toLowerCase());
             message.channel.send(strs.cmd_add_starting);
