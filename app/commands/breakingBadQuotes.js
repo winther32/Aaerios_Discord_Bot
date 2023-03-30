@@ -105,7 +105,7 @@ const BREAKING_BAD_QUOTES = [
 
 module.exports = {
   name: 'bbQuote',
-  description: 'returns a image or gif of beans',
+  description: 'returns quote from Breaking Bad',
   execute(message) {
     index = Util.getRandomInt(0, BREAKING_BAD_QUOTES.length - 1);
     message.channel.send(BREAKING_BAD_QUOTES[index]);

@@ -151,6 +151,9 @@ client.on('message', message => {
             break;
         case 'bbquote':
             client.commands.get("bbQuote").execute(message);
+        case 'witcher':
+        case 'witcherQuote':
+            client.commands.get("witcherQuote").execute(message);
 
         default:
             break;
