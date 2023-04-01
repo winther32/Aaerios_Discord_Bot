@@ -4,8 +4,8 @@
   "description": "Manage twitch clips",
   "main": "main.js",
   "scripts": {
-    "start": "node main",
-    "dev": "node main --dev",
+    "start": "node app/main",
+    "dev": "node app/main --dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mac Lyle",
