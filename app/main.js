@@ -149,12 +149,14 @@ client.on('message', message => {
         case 'songs':
             message.channel.send('https://docs.google.com/spreadsheets/d/1NKLFkkU6ofni-dDHVYciDnjgOVbcyVhjYalAAMqzSzo/edit?usp=sharing');
             break;
+        case 'breakingbad':
         case 'bbquote':
             client.commands.get("bbQuote").execute(message);
+            break;
         case 'witcher':
-        case 'witcherQuote':
+        case 'witcherquote':
             client.commands.get("witcherQuote").execute(message);
-
+            break;
         default:
             break;
     }
