@@ -19,6 +19,7 @@ module.exports = {
                 {name: 'Clips:', value: "`mustard`, `tarkov`, `milk`, `salsa`, `yogurt`, `lockin`"},
                 {name: 'Images:', value: "`angry`, `unit`, `devil`, `nom`, `beans`"},
                 {name: 'Library:', value: "`library`, `songs`, `overwrite`, `add`, `lookup`, `search`"},
+                {name: 'Quotes:', value: "`witcherQuote`, `bbQuote`"},
             )
             .setFooter("Created by Winther");
         
