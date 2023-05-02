@@ -1,15 +1,5 @@
 module.exports = {
-    array: ["https://tenor.com/view/crazy-eyes-kid-pork-and-beans-beans-gif-19099849",
-            "https://tenor.com/view/food-beans-cook-soup-gif-7312038",
-            "https://tenor.com/view/beans-dancing-maracas-gif-13267689",
-            "https://tenor.com/view/beans-tommy-ann-margaret-the-who-gif-17812511",
-            "https://tenor.com/view/beans-bean-stir-stirring-stirring-the-pot-gif-13284878",
-            "https://tenor.com/view/green-beans-vegetables-veggies-food-cooking-gif-17653712",
-            "https://tenor.com/view/shark-puppet-baked-beans-beans-eating-hungry-gif-16962563",
-            "https://tenor.com/view/sperzieboontjes-kerst-green-beans-vegetable-gif-15873452",
-            "https://tenor.com/view/refried-beans-frijoles-mexican-food-cool-beans-mexico-gif-18365013",
-            "https://tenor.com/view/black-beans-burritos-chipotle-beans-tasty-gif-13671215",
-            "https://tenor.com/view/rove-beans-baked-beans-bean-bath-messy-gif-19055038",
+    array: [
             "https://media0.giphy.com/media/DhII10WPoz3rHm6qM8/giphy.gif?cid=ecf05e47r5wqyfcffzmejedchwqfm5hk7w0n7p9uva2cs1u9&rid=giphy.gif&ct=g",
             "https://media0.giphy.com/media/tWiXtHwaR1AhLtgGK6/giphy.gif?cid=ecf05e47ej46cjig7dh6n60n7v7ecezyyjgkemt4jh14wqgt&rid=giphy.gif&ct=g",
             "https://upload.wikimedia.org/wikipedia/commons/d/d9/Heinz_Beanz.jpg",
@@ -20,14 +10,9 @@ module.exports = {
             "https://i.imgur.com/oBTGYa3.jpeg",
             "https://i.imgur.com/Qa0P1W6.jpeg",
             "https://i.imgur.com/zMXrFWx.jpeg",
-            "https://pbs.twimg.com/media/DzOUyTWUUAA6vqU?format=jpg&name=large",
             "https://therecipecritic.com/wp-content/uploads/2020/06/bakedbeansfromscratch.jpg",
-            "https://media.gettyimages.com/photos/yummie-beans-picture-id168282108?k=20&m=168282108&s=612x612&w=0&h=ecADhT1wYQtBrVNcocroHKpMAp9vRjnGn8fUeBEeEjE=",
-            "https://cursed-items-archive.tumblr.com/post/186065386140/there-will-never-be-enough-beans",
             "https://64.media.tumblr.com/0a616bcd1ecf806c8f89350fd8c24264/b43b712b44521ef0-dc/s1280x1920/16bc54d2ae0fe1c9fbbf12156bd07155e41c0d43.jpg",
-            "https://i.chzbgr.com/full/9169815808/hE3E5391E/cursed_image-baseball-filled-with-beans",
             "https://i.pinimg.com/originals/7a/fd/3e/7afd3e8b0d63eccd721b64517af8c38f.jpg",
-            "https://cdn.ebaumsworld.com/2019/10/03/044614/86084683/cursed-images-beans-4.jpg",
             "https://i.imgur.com/NwAM1Zz.jpg",
             "https://i.pinimg.com/originals/7f/6e/58/7f6e580eb3ef439abe9ac5a006f9c248.jpg",
             "https://64.media.tumblr.com/f436617ec39f3631d2992fa69f91d902/44dc0f3b03bf6876-09/s640x960/cd8a4e4f43cdf410da9c3ad568d22d1d424b965e.jpg",
@@ -45,9 +30,7 @@ module.exports = {
             "https://i.redd.it/iceq483xul751.jpg",
             "https://d14iv1hjmfkv57.cloudfront.net/assets/recipes/green-beans-gremolata/_600x600_crop_center-center_61_line/Page-168-web-horizon.jpg?mtime=20160725145139&focal=none&tmtime=20210324103053",
             "https://m.media-amazon.com/images/S/assets.wholefoodsmarket.com//content/9d/fa/1733f6144bbe8c19cbcb7e9ef05a/beans._TTW_._CR1,0,2278,1282_._SR1500,844_._QL100_.jpg",
-            "https://cdn.diabetesselfmanagement.com/2021/05/dsm-are-beans-good-for-diabetics-shutterstock-673527460.jpg",
             "https://health.clevelandclinic.org/wp-content/uploads/sites/3/2018/09/GettyImages-637856596.jpg",
             "https://i2.wp.com/simple-veganista.com/wp-content/uploads/2018/07/healthy-baked-beans-2.jpg",
-            "https://images.fatherly.com/wp-content/uploads/2020/12/beans-fart.jpg?q=65&enable=upscale&w=1200"
         ]
 }
