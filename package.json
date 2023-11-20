@@ -11,8 +11,8 @@
   "author": "Mac Lyle",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.826.0",
-    "discord.js": "^12.3.1",
+    "aws-sdk": "^2.0.0",
+    "discord.js": "^14.0.0",
     "dotenv": "^8.2.0",
     "google-spreadsheet": "^3.1.15",
     "yargs": "^17.1.1"
